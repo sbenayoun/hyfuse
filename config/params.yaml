@@ -6,6 +6,20 @@
 
 seed: 42
 
+# --- Compositional features (T2.3) ---
+# CLR (centered log-ratio) is applied PER VIEW separately; SWIR and TIR
+# abundances are NEVER pooled into one composition.
+# Zero handling: a zero mineral-group abundance means "not detectable in this
+# view", NOT a trace amount. CLR needs strictly positive parts, so we use a
+# multiplicative zero replacement: replace zeros with delta, renormalise the
+# non-zero parts down to preserve the simplex. delta is recorded here and is
+# ABLATABLE. (ASSUMPTION: delta small relative to smallest positive abundance.)
+clr:
+  zero_strategy: multiplicative_replacement
+  delta: 1.0e-6
+  # min_groups: a window needs >= this many non-zero groups to form a composition
+  min_nonzero_groups: 1
+
 # --- Depth compositing / joins (T2.1) ---
 window_size_m: 5.0        # GSWA gold example uses 5 m averaged cut-offs
 min_interval_m: 1.0       # minimum domain interval length (ruptures)

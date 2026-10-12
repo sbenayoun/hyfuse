@@ -107,6 +107,31 @@ VERIFY: on a real GSWA NVCL hole, find the Final Mask scalar / mechanism and
 confirm its on/off direction (plot against core photo or spectra) before
 applying it everywhere (plan T1.6).
 
+## T2.3 compositional CLR features (features.py)
+
+Per-view (NEVER pooled) compositional features from the composited mineral-group
+abundances (T2.1 output):
+- composition_matrix(composited, view): per-window group abundance matrix for ONE
+  view; excludes non-mineral groups ('', INVALID, NOTAROK); absent group = 0
+  (structural zero = not detectable in this view).
+- multiplicative_replacement(mat, delta): zeros -> delta, non-zero parts scaled
+  by (1 - n_zero*delta) so each row stays on the simplex (sum 1).
+- clr(mat): centered log-ratio, requires strictly positive parts (sum-zero rows).
+- clr_features(composited, view, delta, min_nonzero_groups): full pipeline;
+  columns PREFIXED with the view (swir_/tir_) so groups seen in both views
+  (e.g. KAOLIN) don't collide when the fusion arm concatenates them.
+
+Zero strategy recorded in params.clr: multiplicative_replacement, delta=1e-6
+(ABLATABLE). zeros = "not detectable in this view", not trace.
+
+Validated on ETG0187: SWIR features (KAOLIN/WHITE-MICA/CHLORITE/SULPHATE/
+TOURMALINE), TIR features (SILICA/CARBONATE/OXIDE/KAOLIN/WHITE-MICA/SULPHATE);
+geologically sensible, clr rows sum ~0, no view pooling.
+
+Tests (tests/test_clr.py, 6): per-view separation + INVALID exclusion, simplex
+preservation, exact CLR known values (ln2 ratio, sum-zero), non-positive
+rejection, view-prefixed end-to-end, min_nonzero_groups filter. 29 tests pass.
+
 ## T2.2 assay hygiene (implemented in qc.py)
 
 Functions: resolve_below_detection, flag_implausible, assays_wide_to_long.

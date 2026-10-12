@@ -17,6 +17,8 @@ import logging
 import sys
 from pathlib import Path
 
+import numpy as np
+import pandas as pd
 import yaml
 
 from hyfuse import qc, read
@@ -27,6 +29,107 @@ ROOT = Path(__file__).resolve().parent.parent.parent
 RAW_HOLES = ROOT / "data" / "raw" / "holes"
 DERIVED_HOLES = ROOT / "data" / "derived" / "holes"
 HOLES_YAML = ROOT / "config" / "holes.yaml"
+
+
+# --------------------------------------------------------------------------- #
+# T2.3 compositional (CLR) features — PER VIEW, never pooled across views.
+# --------------------------------------------------------------------------- #
+
+# Non-mineral group states excluded from the composition (kept elsewhere as
+# explicit flags, but they are not real mineral parts of the rock).
+_NON_COMPOSITION_GROUPS = {"", "INVALID", "NOTAROK"}
+
+
+def composition_matrix(composited: pd.DataFrame, view: str) -> pd.DataFrame:
+    """Per-window mineral-group abundance matrix for ONE view.
+
+    Input: output of composite.composite_minerals (hole_id, win_from, win_to,
+    view, mineral_group, mean_abundance, ...). Returns a frame indexed by
+    (hole_id, win_from, win_to) with one column per real mineral group; absent
+    groups are 0 (structural zero = not detectable in this view).
+    """
+    v = composited[composited["view"] == view].copy()
+    v = v[~v["mineral_group"].isin(_NON_COMPOSITION_GROUPS)]
+    v = v.dropna(subset=["mean_abundance"])
+    if v.empty:
+        return pd.DataFrame()
+    mat = v.pivot_table(
+        index=["hole_id", "win_from", "win_to"],
+        columns="mineral_group",
+        values="mean_abundance",
+        fill_value=0.0,
+    )
+    mat.columns.name = None
+    return mat
+
+
+def multiplicative_replacement(mat: pd.DataFrame, delta: float) -> pd.DataFrame:
+    """Replace zeros with delta and renormalise rows to sum 1 (simplex).
+
+    Multiplicative (Martín-Fernández) style: zeros -> delta; non-zero parts are
+    scaled by (1 - n_zero*delta) so each row still sums to 1. Rows that are all
+    zero are left all-zero (handled/absent upstream).
+    """
+    arr = mat.to_numpy(dtype=float)
+    out = arr.copy()
+    for i in range(arr.shape[0]):
+        row = arr[i]
+        total = row.sum()
+        if total <= 0:
+            continue
+        comp = row / total  # close to the simplex first
+        zeros = comp == 0
+        nz = ~zeros
+        n_zero = int(zeros.sum())
+        if n_zero == 0:
+            out[i] = comp
+            continue
+        comp_new = comp.copy()
+        comp_new[zeros] = delta
+        comp_new[nz] = comp[nz] * (1.0 - n_zero * delta)
+        out[i] = comp_new
+    return pd.DataFrame(out, index=mat.index, columns=mat.columns)
+
+
+def clr(mat: pd.DataFrame) -> pd.DataFrame:
+    """Centered log-ratio of a strictly-positive composition matrix.
+
+    clr(x)_j = ln(x_j) - mean_k ln(x_k). Requires all parts > 0 (apply
+    multiplicative_replacement first). Returns same shape, columns suffixed
+    '_clr'.
+    """
+    arr = mat.to_numpy(dtype=float)
+    if (arr <= 0).any():
+        raise ValueError("clr requires strictly positive parts; "
+                         "apply multiplicative_replacement first")
+    logx = np.log(arr)
+    centred = logx - logx.mean(axis=1, keepdims=True)
+    return pd.DataFrame(centred, index=mat.index,
+                        columns=[f"{c}_clr" for c in mat.columns])
+
+
+def clr_features(composited: pd.DataFrame, view: str,
+                 delta: float = 1e-6,
+                 min_nonzero_groups: int = 1) -> pd.DataFrame:
+    """Full per-view CLR pipeline: matrix -> zero-replace -> CLR.
+
+    Drops windows with fewer than `min_nonzero_groups` detectable groups.
+    Returns the CLR feature matrix for the view (never mixes views). Columns are
+    prefixed with the view ('swir_'/'tir_') so that when the fusion arm later
+    concatenates both views, groups detectable in both (e.g. KAOLIN) stay
+    distinct and do not collide.
+    """
+    mat = composition_matrix(composited, view)
+    if mat.empty:
+        return mat
+    keep = (mat > 0).sum(axis=1) >= min_nonzero_groups
+    mat = mat[keep]
+    if mat.empty:
+        return mat
+    replaced = multiplicative_replacement(mat, delta)
+    out = clr(replaced)
+    out.columns = [f"{view}_{c}" for c in out.columns]
+    return out
 
 
 def build_hole(hole_id: str, instrument_gen: str = "unknown") -> Path | None:

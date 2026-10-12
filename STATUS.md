@@ -1,4 +1,4 @@
-NEXT ACTION: T2.3 — per-view compositional (CLR) features: build per-window mineral-group composition vectors per view (swir, tir separately), apply CLR with a documented zero strategy (zeros = "not detectable in this view", do not impute as trace without recording); never mix SWIR+TIR into one composition. Add tests.
+NEXT ACTION: T2.4 — per-view domaining: PCA -> HDBSCAN (record params, wire seed) -> depth-aware segmentation with ruptures + min interval length; also a PCA + k-means baseline. Output per hole: domain labels, boundaries, soft membership where available. Add tests. (CLR features T2.3 done.)
 
 # HyFuse status
 
@@ -99,6 +99,13 @@ NEXT ACTION: T2.3 — per-view compositional (CLR) features: build per-window mi
   assays_wide_to_long (DASC wide -> long for the overlap join).
 - Target = Au_PPM only (2362 rows / all 15 holes; others <=3 holes). params updated.
 - 6 tests incl. end-to-end into overlap join. 23 tests pass. Validated on BBDD0001.
+
+## Done (T2.3, CLR features in features.py)
+- composition_matrix / multiplicative_replacement / clr / clr_features.
+- PER VIEW only; view-prefixed columns (swir_/tir_) so fusion concat won't
+  collide. Zero strategy in params.clr (multiplicative, delta=1e-6, ablatable).
+- 6 tests (exact CLR math, simplex preservation, per-view separation). 29 pass.
+- Validated on ETG0187 (geologically sensible SWIR vs TIR CLR features).
 
 ## Pre-fetched assets (in ../, outside the repo)
 - ../datasets/INTERIM_HyLogger_Dataset_Package_GDA2020_DB.zip (DASC package,
