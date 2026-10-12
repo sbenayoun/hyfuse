@@ -68,3 +68,14 @@ def test_metres_after_mask():
     })
     # kept lengths: 1.0 + 1.5 = 2.5 ; masked-off row excluded
     assert qc.metres_after_mask(df) == 2.5
+
+
+def test_infer_instrument_gen_from_views():
+    # R2 F2: instrument_gen derived from present spectral views.
+    from types import SimpleNamespace
+
+    from hyfuse.read import infer_instrument_gen
+
+    assert infer_instrument_gen(SimpleNamespace(mir=object(), tir=object())) == "HL4"
+    assert infer_instrument_gen(SimpleNamespace(mir=None, tir=object())) == "HL3+"
+    assert infer_instrument_gen(SimpleNamespace(mir=None, tir=None)) == "HL2+"

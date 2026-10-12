@@ -1,4 +1,4 @@
-NEXT ACTION: R2 verification (fresh session, scope A-F) at the current commit, then Day 3 T3.1 (planted-truth synth.py: simulate known mineral mixes with view-specific detectability masks; SWIR-active set from params; 97% qtz/3% chlorite case; fused arm must recover truth >= single views). CUT LINE passed (T2.4/T2.5 work) -> fusion stays in.
+NEXT ACTION: Day 3 T3.1 (planted-truth synth.py). R2 PASSED at e9eafa0 (Go with fixes): F1 (scaler-in-CV-pipeline) FIXED, F2 (instrument_gen inferred HL2+/HL3+/HL4) FIXED. See reports/review_R2.md + review_response.md. 57 tests pass. CUT LINE passed (fusion stays).
 
 # HyFuse status
 

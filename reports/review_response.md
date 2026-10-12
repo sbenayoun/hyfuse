@@ -1,4 +1,48 @@
-# HyFuse — builder response to review R1
+# HyFuse — builder response to review R2
+
+Reviewer report: `reports/review_R2.md` (independent fresh session, commit
+`e9eafa0`, scope A-F). Verdict: **Go with fixes, none blocking.** The builder
+session does not edit the review; dispositions below (AGENT_INSTRUCTIONS §4A).
+
+## Dispositions (R2)
+
+### F1 [minor] Scaler fit outside the CV split in confounder_classifier_auc
+**FIXED (commit <this>).** Replaced `StandardScaler().fit_transform(x)` before
+`cross_val_score` with a `sklearn.pipeline.Pipeline([scaler, LogisticRegression])`
+passed to `cross_val_score`, so the scaler is fit per training fold (GroupKFold by
+hole). Verified: confounder tests still pass (planted-confounded flagged, clean
+not), 57 tests green. This also hardens the helper before T3.3 reuses it for a
+metric we want to be HIGH (where the leak would have inflated the result).
+
+### F2 [minor] instrument_gen never populated (constant 'unknown')
+**FIXED (commit <this>).** read.read_hole now accepts instrument_gen='infer' and
+features.build_hole defaults to 'infer', deriving the HyLogger generation from the
+present spectral views (MIR->HL4, TIR->HL3+, VNIR/SWIR only->HL2+) per the GSWA
+Spectral Regions slide. Rebuilt ETG0187 -> instrument_gen='HL3+' (has TIR, no MIR),
+no longer constant. New test test_infer_instrument_gen_from_views. VERIFY against a
+firmer package metadata field if one exists. T3.3 must confirm the fetched shortlist
+spans >=2 processing levels / instrument generations for the confounder control to
+be non-vacuous (carried into Day-3 plan).
+
+## Checklist items UNVERIFIED at R2 (expected; Day-3 T3.x)
+C2 (four arms on identical windows/holes), C3 (alternative-explanations list),
+F3 (naive-concat arm as runnable code), the headline fusion claim, and cross-hole
+leakage of the full ablation — all depend on fusion.py / evaluate.py result tables
+/ confounders.md, which are T3.2/T3.3. The scoring/confounder/boundary ENGINES are
+present and unit-tested now, and were reviewed as such.
+
+## Confirmed PASS at R2 (no action needed)
+Pre-registration verified by git timestamps (params freeze 96c0454 precedes
+scoring e6f0786; no ablation file exists). Final Mask / invalid-aspectral / TSAV /
+Mineral-Group / Wt1=1.0 / never-pool-views all PASS on real ETG0187. Assay units/
+below-detection/overlap-weighting/target-selection all PASS. Permutation baseline
++ negative controls collapse to chance. 56/56 tests at review time (57 after fixes).
+
+## Questions for a human expert (carried into Day 3)
+Reviewer raised 4 (below-detection |x|/2 convention; Au >100000 ppm real vs error;
+SWIR-active set vs GSWA SKOS; processing-suffix choice). All already logged as
+VERIFY items; to be put to GSWA and reflected in T3.1 (synth) and the README.
+
 
 Reviewer report: `reports/review_R1.md` (independent fresh session, commit
 `1f36dca`, scope D/E/I). The builder session does NOT edit the review itself;

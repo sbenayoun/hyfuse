@@ -23,6 +23,7 @@ import numpy as np
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import mutual_info_score
 from sklearn.model_selection import GroupKFold, cross_val_score
+from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
 
 
@@ -177,11 +178,16 @@ def confounder_classifier_auc(features: np.ndarray, confounder,
     if len(classes) < 2 or out["n_groups"] < 2 or x.shape[0] < 4:
         out["note"] = "degenerate (single class / too few groups); chance only"
         return out
-    xs = StandardScaler().fit_transform(x)
     n_splits = _n_groups_splits(g)
-    clf = LogisticRegression(max_iter=1000, random_state=seed)
+    # Scaler INSIDE the CV pipeline so it is fit on each training fold only
+    # (R2 finding F1: fitting the scaler on the full matrix before the split is
+    # a leakage pattern; a Pipeline fits it per fold).
+    pipe = Pipeline([
+        ("scaler", StandardScaler()),
+        ("clf", LogisticRegression(max_iter=1000, random_state=seed)),
+    ])
     try:
-        scores = cross_val_score(clf, xs, y, groups=g,
+        scores = cross_val_score(pipe, x, y, groups=g,
                                  cv=GroupKFold(n_splits=n_splits),
                                  scoring="accuracy")
         out["cv_accuracy"] = float(scores.mean())

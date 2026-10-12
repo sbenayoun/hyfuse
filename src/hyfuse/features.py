@@ -132,8 +132,12 @@ def clr_features(composited: pd.DataFrame, view: str,
     return out
 
 
-def build_hole(hole_id: str, instrument_gen: str = "unknown") -> Path | None:
-    """Read one fetched TSG hole -> tidy Parquet. Returns the Parquet path."""
+def build_hole(hole_id: str, instrument_gen: str = "infer") -> Path | None:
+    """Read one fetched TSG hole -> tidy Parquet. Returns the Parquet path.
+
+    instrument_gen defaults to 'infer' (derive HL generation from present views,
+    R2 finding F2) so the column is a real confounder, not a constant 'unknown'.
+    """
     folder = RAW_HOLES / hole_id
     if not folder.exists():
         log.error("hole folder missing (fetch first): %s", folder)

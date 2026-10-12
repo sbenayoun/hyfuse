@@ -167,19 +167,42 @@ def _tidy_view(spectra, view: str, hole_id: str, processing_hint: str) -> pd.Dat
 
 def read_hole(folder: str, hole_id: str | None = None,
               instrument_gen: str = "unknown") -> pd.DataFrame:
-    """Read one TSG package folder into the tidy long table (SWIR+TIR)."""
+    """Read one TSG package folder into the tidy long table (SWIR+TIR).
+
+    If instrument_gen == 'infer', derive it from which spectral views are
+    present (per the GSWA 'Spectral Regions' slide): MIR present -> HyLogger 4;
+    TIR present (no MIR) -> HyLogger 3+; VNIR/SWIR only -> HyLogger 2+. This
+    makes instrument_gen a real confounder column instead of a constant.
+    """
     import pytsg
 
     hid = hole_id or _infer_hole_id(folder)
     data = pytsg.read_tsg(folder)
+    gen = instrument_gen
+    if instrument_gen == "infer":
+        gen = infer_instrument_gen(data)
     frames = []
     if data.nir is not None:
-        frames.append(_tidy_view(data.nir, "swir", hid, instrument_gen))
+        frames.append(_tidy_view(data.nir, "swir", hid, gen))
     if data.tir is not None:
-        frames.append(_tidy_view(data.tir, "tir", hid, instrument_gen))
+        frames.append(_tidy_view(data.tir, "tir", hid, gen))
     if not frames:
         return pd.DataFrame()
     return pd.concat(frames, ignore_index=True)
+
+
+def infer_instrument_gen(data) -> str:
+    """Infer HyLogger generation from present spectral views.
+
+    MIR (2500-5500 nm) -> HyLogger 4; TIR (5500-15000 nm) -> HyLogger 3+;
+    VNIR-SWIR only -> HyLogger 2+. VERIFY against the package metadata where a
+    firmer instrument field is available.
+    """
+    if getattr(data, "mir", None) is not None:
+        return "HL4"
+    if getattr(data, "tir", None) is not None:
+        return "HL3+"
+    return "HL2+"
 
 
 def _infer_hole_id(folder: str) -> str:
