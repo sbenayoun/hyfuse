@@ -138,3 +138,44 @@ def assays_wide_to_long(
     if not frames:
         return pd.DataFrame(columns=out_cols)
     return pd.concat(frames, ignore_index=True)[out_cols]
+
+
+# --------------------------------------------------------------------------- #
+# Corruption guards (T2.7) — explicit detectors the corruption tests assert on.
+# --------------------------------------------------------------------------- #
+
+def assay_unit_sanity(long_assays: pd.DataFrame,
+                      plausibility_ppm: dict[str, list[float]] | None) -> dict:
+    """Summarise implausible assay fractions per element (catches x1000 errors).
+
+    Returns {element: {n, n_implausible, frac_implausible}}. A unit error that
+    multiplies values by 1000 pushes most rows past the plausibility cap, so
+    frac_implausible jumps from ~0 to ~1 — the signal the x1000 test asserts.
+    """
+    out: dict[str, dict] = {}
+    if long_assays.empty:
+        return out
+    for el, g in long_assays.groupby("element"):
+        flagged = flag_implausible(g["value"], el, plausibility_ppm)
+        n = len(g)
+        ni = int(flagged.sum())
+        out[el] = {"n": n, "n_implausible": ni,
+                   "frac_implausible": (ni / n) if n else 0.0}
+    return out
+
+
+def hole_id_consistency(abundance: pd.DataFrame, other: pd.DataFrame,
+                        *, key: str = "hole_id") -> dict:
+    """Check that hole ids line up between two tables before an interval join.
+
+    Returns overlap stats; if the id sets are disjoint (e.g. ids were shuffled
+    between abundance and logs), overlap == 0 and `consistent` is False — the
+    signal the shuffled-id test asserts.
+    """
+    a = set(map(str, abundance[key].unique()))
+    b = set(map(str, other[key].unique()))
+    inter = a & b
+    return {"n_abundance_ids": len(a), "n_other_ids": len(b),
+            "n_overlap": len(inter),
+            "consistent": len(inter) > 0,
+            "overlap_fraction": (len(inter) / max(1, len(a | b)))}

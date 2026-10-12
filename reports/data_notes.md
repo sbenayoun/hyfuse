@@ -107,6 +107,19 @@ VERIFY: on a real GSWA NVCL hole, find the Final Mask scalar / mechanism and
 confirm its on/off direction (plot against core photo or spectra) before
 applying it everywhere (plan T1.6).
 
+## T2.7 corruption tests (tests/test_corruption.py) + guards (qc.py)
+
+The pipeline must FLAG or visibly DEGRADE on each injected fault; a silent pass
+is a failure. Each test also checks the CLEAN case does NOT trip the guard.
+- Fault 1 assays x1e6: assay_unit_sanity frac_implausible jumps 0.0 -> >=0.8
+  (via flag_implausible + params plausibility cap).
+- Fault 2 depth offset (+10 m >> 2 m tol): boundary_agreement F1 drops 1.0 -> 0.0.
+- Fault 3 Final Mask ignored: kept rows 3 vs 6, metres 3.0 vs 6.0; mask_summary
+  makes dropped rows explicit (swir_dropped=3).
+- Fault 4 shuffled hole ids: hole_id_consistency n_overlap 1 -> 0 (consistent
+  False) and overlap_weight_assays returns empty (join collapses).
+New guards in qc.py: assay_unit_sanity, hole_id_consistency. 53 tests pass.
+
 ## T2.6 confounder check (evaluate.py)
 
 Does the clustering/domaining just reflect processing_level or instrument_gen

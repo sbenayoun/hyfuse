@@ -1,4 +1,4 @@
-NEXT ACTION: T2.7 — corruption tests (tests/test_corruption.py): the pipeline must FLAG or visibly DEGRADE on each of (a) assays x1000 / ÷1000, (b) depth offset (e.g. +1 m), (c) Final Mask ignored (non-core rows included), (d) hole IDs shuffled between abundance and logs. Each test asserts a raised flag/warning OR a clear metric drop; silent pass = failure.
+NEXT ACTION: T2.8 — minimal Streamlit viewer (app/viewer.py): select a hole -> depth log showing logged units, detected domains/boundaries, and mineral-group stacks. Reads per-hole Parquet via DuckDB. Static Plotly HTML acceptable. Then CUT-LINE check + R2 verification (scope A-F).
 
 # HyFuse status
 
@@ -126,6 +126,12 @@ NEXT ACTION: T2.7 — corruption tests (tests/test_corruption.py): the pipeline 
   (GroupKFold vs majority), confounder_report (flag_confounded). Grouped by hole.
 - 6 tests: planted confounded flagged, clean not, degenerate handled. 49 pass.
 - Real reports/confounders.md produced in T3.3.
+
+## Done (T2.7, corruption tests + qc guards)
+- 4 faults each flag/degrade with clean-case control: assay x1e6 (frac_implausible
+  jump), depth offset (F1 1.0->0.0), mask ignored (rows/metres change), shuffled
+  ids (join collapses). New guards: assay_unit_sanity, hole_id_consistency.
+- 53 tests pass.
 
 ## Pre-fetched assets (in ../, outside the repo)
 - ../datasets/INTERIM_HyLogger_Dataset_Package_GDA2020_DB.zip (DASC package,
