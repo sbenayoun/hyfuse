@@ -68,7 +68,35 @@ valid `Error` here is in roughly [0, 1000].
 **`D` = downhole depth in metres** (PE257D starts ~65.9 m). `X` appears to be
 along-core position. Use `D` for depth alignment in read.py/features.py.
 
-## Final Mask (STILL VERIFY on a real NVCL hole)
+## Final Mask (RESOLVED on a real NVCL hole: ETG0187)
+
+Confirmed on the real NVCL hole ETG0187 (fetched via fetch.py, T1.4):
+there IS a dedicated **`Final Mask`** scalar column, present in BOTH the
+NIR and TIR sections. It is binary float32 (1.0 / 0.0).
+
+- ETG0187: 1744 rows `Final Mask == 1.0`, 1091 rows `== 0.0`, identical counts
+  in NIR and TIR (same mask applied to both views).
+- Direction (evidenced): the 1091 masked-off (0.0) rows coincide with the
+  ~1110 EMPTY-string `Min1`/`Grp1` values -> masked-off rows carry no mineral
+  result. So **`Final Mask == 1.0` = KEEP (clean core); `0.0` = DROP.**
+  Matches plan T1.6. STILL VERIFY by plotting mask vs core photo once, but the
+  row-count alignment is strong evidence.
+- The CSIRO example hole (PE257D) did NOT have this column; it only appears on
+  NVCL-processed packages. So test Final Mask handling against a real NVCL hole,
+  not the pytsg example.
+
+### Processing-level naming varies per hole (confirmed)
+- PE257D (CSIRO example): SWIR `sTSAS`/`sTSAV`, TIR `sTSAT`/`uTSAT`.
+- ETG0187 (NVCL): SWIR `sTSAS`/`uTSAS`/`sTSAV`, TIR `sjCLST`/`ujCLST` (CLST
+  classifier variant). => read scalar column suffixes per hole; do not hardcode
+  one processing-level name. `s*`=system/constrained, `u*`=unconstrained.
+
+### Complementarity on real data (ETG0187)
+- SWIR top groups: KAOLIN, WHITE-MICA, SULPHATE, CHLORITE (hydroxyl minerals).
+- TIR top groups: SILICA (Quartz 1452), KAOLIN, CARBONATE, WHITE-MICA.
+  TIR sees the quartz SWIR cannot -> the exact HyFuse premise, visible in data.
+
+## Final Mask (original note, pytsg example PE257D)
 
 No standalone "Final Mask" scalar column in this example hole. Candidates:
 1. the `MaskedOff` **class value** appearing in `Min1`/`Grp1`;

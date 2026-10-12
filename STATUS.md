@@ -1,4 +1,4 @@
-NEXT ACTION: T1.3 — on a REAL NVCL hole, confirm the Final Mask scalar name and on/off direction, and whether NVCL exposes a cleaner processing-level flag than the column suffixes (sTSAS/sTSAT/uTSAT). TSG read path + mineral/group/error decoding already validated offline.
+NEXT ACTION: T1.5 — locate/attach the DASC SQLite package in DuckDB (already downloaded at ../datasets/INTERIM_HyLogger_Dataset_Package_GDA2020_DB.zip), read the data dictionary, and list the key tables/columns (hylogger_dataset_index, wamex_dh_geology, wapims_lithology) into reports/data_notes.md.
 
 # HyFuse status
 
@@ -24,12 +24,23 @@ NEXT ACTION: T1.3 — on a REAL NVCL hole, confirm the Final Mask scalar name an
 ## Found (T1.2/T1.3, see reports/data_notes.md)
 - pytsg decodes Min1/Grp1 to mineral NAME strings; no manual code lookup needed
   for TSG results. Grp1 = harmonised groups (WHITE-MICA, SILICA, KAOLIN, ...).
-- Column convention: SWIR=sTSAS (ignore sTSAV), TIR=sTSAT/uTSAT. Error=confidence.
+- Column convention: SWIR=sTSAS (ignore sTSAV), TIR=sTSAT/uTSAT or sjCLST/ujCLST
+  (varies per hole; read suffixes per hole). Error=confidence.
 - aspectral/invalid/MaskedOff appear as explicit Min1/Grp1 class values.
 - CRITICAL: Wt1/Error carry float32 null sentinel -3.4e38 on masked rows ->
   must null before stats (feeds qc.py + corruption tests T2.7).
 - Depth = sampleheaders['D'] (metres).
-- Final Mask: no standalone column in the CSIRO example; VERIFY on a real NVCL hole.
+- Final Mask RESOLVED on real hole ETG0187: dedicated `Final Mask` scalar in
+  NIR and TIR, binary 1.0=keep / 0.0=drop (1744 keep, 1091 drop; masked-off rows
+  have empty mineral results). Not present in CSIRO example PE257D.
+
+## Found (T1.4, fetch.py)
+- fetch.py works: downloads from THREDDS fileServer, caches, extracts TSG only.
+  THREDDS download URL = https://thredds.nci.org.au/thredds/fileServer/rs07/WA/<HOLE>.zip
+- Bug fixed: zip entries use Windows backslash paths inside a UUID subfolder;
+  normalise '\\'->'/' before basename so files flatten for pytsg.read_tsg.
+- Cache no-op verified (T1.4 acceptance). --max-holes guard in place.
+- Test hole ETG0187 (114 MB, 10 m, NIR+TIR) downloaded to data/raw/holes/ (git-ignored).
 
 ## Pre-fetched assets (in ../, outside the repo)
 - ../datasets/INTERIM_HyLogger_Dataset_Package_GDA2020_DB.zip (DASC package,
