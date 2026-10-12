@@ -1,4 +1,4 @@
-NEXT ACTION: T1.5 — locate/attach the DASC SQLite package in DuckDB (already downloaded at ../datasets/INTERIM_HyLogger_Dataset_Package_GDA2020_DB.zip), read the data dictionary, and list the key tables/columns (hylogger_dataset_index, wamex_dh_geology, wapims_lithology) into reports/data_notes.md.
+NEXT ACTION: T1.6 — implement read.py/features.py to produce per-hole tidy depth-aligned Parquet (one row per measurement: hole_id, depth_from/to, view, mineral_group, mineral, abundance, error, final_mask, processing_level, instrument_gen), applying Final Mask (keep==1.0) and nulling the -3.4e38 sentinel; validate on ETG0187.
 
 # HyFuse status
 
@@ -41,6 +41,21 @@ NEXT ACTION: T1.5 — locate/attach the DASC SQLite package in DuckDB (already d
   normalise '\\'->'/' before basename so files flatten for pytsg.read_tsg.
 - Cache no-op verified (T1.4 acceptance). --max-holes guard in place.
 - Test hole ETG0187 (114 MB, 10 m, NIR+TIR) downloaded to data/raw/holes/ (git-ignored).
+
+## Found (T1.5, DASC package, see reports/data_notes.md)
+- DASC sqlite extracted to data/raw/dasc/ (git-ignored). DuckDB ATTACH with
+  (TYPE sqlite, READ_ONLY) CONFIRMED working (plan 2A step 5 verbatim).
+- 13 tables + 7 curated v_* views. Index=2019 holes; dh_geology=173k intervals;
+  assay_flat=391k rows; wapims_lithology=1258.
+- KEY: SCDATE_TIR (populated) is the TIR-presence proxy the plan lacked.
+  TIR 1958/2019, MIR 15, Level2 601, Assay_data=1 1194, Logging_data=1 1268.
+  VERIFY: SCDATE_TIR near-universal (1958) is suspiciously high -> confirm usable
+  TIR mineral results per shortlisted hole from the TSG package.
+- COVERAGE for GATE 1: TIR + assays + logging = 1124 holes (gold 399, cu+au 81,
+  cu 53, ni 38, REE 18...). Four-arm ablation viable; GATE 1 will not trigger.
+- wamex_dh_geology has harmonised GSWARockName alongside company codes.
+- wamex_assay_flat_data has ~100 element cols, units explicit (*_PCT / *_PPM);
+  join to HyLogger via CollarId <- index.WAMEX_CollarId.
 
 ## Pre-fetched assets (in ../, outside the repo)
 - ../datasets/INTERIM_HyLogger_Dataset_Package_GDA2020_DB.zip (DASC package,

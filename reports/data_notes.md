@@ -107,7 +107,77 @@ VERIFY: on a real GSWA NVCL hole, find the Final Mask scalar / mechanism and
 confirm its on/off direction (plot against core photo or spectra) before
 applying it everywhere (plan T1.6).
 
-## Open VERIFY items carried forward
+## DASC package (T1.5, RESOLVED)
+
+Extracted to data/raw/dasc/ (git-ignored) from
+../datasets/INTERIM_HyLogger_Dataset_Package_GDA2020_DB.zip:
+- HyLogger_Dataset_Package.sqlite (180 MB)
+- DATADICTIONARY_INTERIM_Hylogger_GDA2020.pdf, METADATA_...pdf
+
+DuckDB access CONFIRMED (plan 2A step 5 verbatim):
+`INSTALL sqlite; LOAD sqlite;` then
+`ATTACH '.../HyLogger_Dataset_Package.sqlite' AS dasc (TYPE sqlite, READ_ONLY);`
+READ_ONLY works for the sqlite type in duckdb 1.5.6. Queries run fine.
+
+### Tables (row counts)
+- hylogger_dataset_index: 2019 (one row per HyLogger hole; ~matches THREDDS ~2000)
+- wamex_dh_geology: 173600 (logged rock-type intervals), wapims_lithology: 1258
+- wamex_assay_flat_data: 391415 (wide assay rows), wamex_assay_flat_metadata: 59568
+- wamex_collar: 1676, wapims_collar: 206, wamex_survey: 62504, wapims_survey: 6662
+- meta_build / meta_data_quality / meta_sources (provenance)
+- v_* VIEWS: v_assay_flat_valid, v_dh_geology_valid, v_survey_valid,
+  v_collar_summary, v_wapims_collar_summary, v_index_wamex_links,
+  v_wapims_lithology_links -> curated/validated versions; prefer these where sensible.
+
+### hylogger_dataset_index key columns
+- Linkage: NVCL_HoleName, WAMEX_report_Anumber(_alternate), WAMEX_CollarId(_alternate),
+  WAPIMS_report_Wnumber, Hole_name, Database.
+- Processing level: LEV1_REL_D, LEV2_REL_D (release-date strings; non-null => that
+  level released). VERIFY exact LEV2_REL_D semantics in the data dictionary PDF.
+- Scan dates: SCAN_DATE (VNIR/SWIR), SCDATE_TIR, SCDATE_MIR.
+- Commodity: COMMODITY, Commodity_vocab (harmonised), WS_TargetCommodity.
+- Presence flags (TEXT '0'/'1'): Collar_data, Survey_data, Assay_data,
+  Logging_data, Geophysics_data.
+- Coords: Shapefile_latitude/longitude (GDA2020).
+
+### KEY FINDING: SCDATE_TIR answers "which holes have TIR" without downloading
+The index did not obviously flag TIR, but **SCDATE_TIR populated is a direct
+proxy for a TIR scan**. Counts:
+- has TIR (SCDATE_TIR set): 1958 / 2019
+- has MIR (SCDATE_MIR set):   15 / 2019
+- has Level 2 (LEV2_REL_D):  601 / 2019
+- Assay_data=1: 1194 ; Logging_data=1: 1268
+`VERIFY:` SCDATE_TIR is near-universal (1958/2019), which is suspiciously high
+for a HyLogger-3+-only measurement. Treat it as a first-pass filter and CONFIRM
+usable TIR mineral results per shortlisted hole from the actual TSG package
+(as done for ETG0187), before trusting it.
+
+### Coverage for GATE 1 (far above the ~8-hole threshold)
+Holes with TIR + Assay_data=1 + Logging_data=1: **1124**. By Commodity_vocab:
+gold 399, copper+gold 81, copper 53, nickel 38, gold+nickel 31, REE 18, ...
+=> The four-arm ablation is viable; GATE 1 will not trigger. Gold is the default
+headline commodity (399 holes); copper (53) is the organisers' example.
+
+### Logged lithology columns (for T2.5 boundary scoring)
+- wamex_dh_geology: CollarId, FromDepth, ToDepth, CompanyLithologyName,
+  CompanyLithologyCodeMerged (company-specific), **GSWARockName (harmonised!)**,
+  GSWARegolithName, colour/weathering. => a harmonised lithology column EXISTS;
+  can score boundaries on company intervals and optionally compare GSWARockName.
+- wapims_lithology: separate petroleum-well lithology table.
+
+### Assay table (for T2.2) — units explicit in column names
+wamex_assay_flat_data: CollarId, FromDepth, ToDepth, MidDepth, then ~100 element
+columns already unit-suffixed: oxides *_PCT (SiO2_PCT, Al2O3_PCT, Fe2O3T_PCT,...),
+trace *_PPM (Au_PPM, As_PPM, Cu_PPM, S_PPM, ...). Units explicit -> de-risks T2.2
+unit errors, but still apply plausibility ranges (companies still make mistakes).
+Join key to HyLogger: CollarId <- hylogger_dataset_index.WAMEX_CollarId.
+
+### Open VERIFY (T1.5)
+- Exact LEV2_REL_D meaning + any instrument-generation column (data dictionary PDF;
+  no PDF reader installed yet — defer, or `uv add pypdf` if needed).
+- Confirm the CollarId join path index.WAMEX_CollarId -> wamex_* on real holes.
+
+## Open VERIFY items carried forward (earlier tasks)
 - Final Mask scalar name + on/off direction on a real NVCL hole.
 - Whether NVCL holes expose a cleaner processing-level flag than column suffixes.
 - Confirm `D` units/datum on an NVCL hole (collar vs downhole).
