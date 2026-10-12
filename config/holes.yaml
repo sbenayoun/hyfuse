@@ -1,0 +1,9 @@
+# config/holes.yaml — pinned hole IDs to work on (T1.1, filled in T1.7).
+#
+# Hard rule: work ONLY on holes listed here. Start with 15-20 holes.
+# Do NOT bulk-download. The coverage audit (T1.7) decides the final set.
+#
+# ASSUMPTION: empty for now; populated after the coverage audit shortlists
+# holes with SWIR + TIR + (logs or assays). See AGENT_INSTRUCTIONS.md T1.7.
+
+holes: []

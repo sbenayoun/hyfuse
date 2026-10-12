@@ -1,0 +1,49 @@
+# config/params.yaml — pre-registered parameters (T2.5).
+#
+# CRITICAL: success criteria and tolerances are frozen here BEFORE results
+# are seen, and this file must be committed before the first results file.
+# See PROJECT_BRIEF.md section 6 and AGENT_INSTRUCTIONS.md T2.5.
+
+seed: 42
+
+# --- Depth compositing / joins (T2.1) ---
+window_size_m: 5.0        # GSWA gold example uses 5 m averaged cut-offs
+min_interval_m: 1.0       # minimum domain interval length (ruptures)
+
+# --- Boundary agreement metric (T2.5) ---
+depth_tolerance_m: 2.0    # placeholder; freeze before scoring
+boundary_metric: f1       # precision / recall / f1 within tolerance
+
+# --- Cross-validation (T2.5, T3.3) ---
+cv:
+  scheme: GroupKFold      # grouped by hole_id (leave-holes-out)
+  n_splits: 5
+  group_by: hole_id
+
+# --- Bootstrap (uncertainty) ---
+bootstrap:
+  n_resamples: 1000
+  unit: hole              # resample over holes, not windows
+
+# --- Assay targets (T2.2); chosen from coverage audit, max 3 ---
+assay_targets: []         # e.g. [Au, As, Fe2O3] — decide from data
+
+# --- SWIR-active mineral set for planted-truth sim (T3.1) ---
+# ASSUMPTION: first guess from a GSWA geologist's statement + Spectral
+# Regions slide. SWIR sees hydroxyl-bearing minerals, carbonates, sulfates;
+# NOT anhydrous silicates. Chlorite is in BOTH views. VERIFY against the
+# GSWA SKOS vocabulary.
+swir_active_minerals:
+  - white_mica
+  - chlorite        # also appears in TIR (bridge mineral)
+  - kaolinite
+  - carbonate
+  - sulfate
+
+# --- Success criterion (pre-registered, PROJECT_BRIEF.md section 6) ---
+# Fusion beats the best single view on >=1 metric with a hole-level bootstrap
+# interval excluding zero, and is not worse on the others.
+success:
+  must_beat: best_single_view
+  min_metrics_improved: 1
+  interval_excludes_zero: true
