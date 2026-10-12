@@ -107,6 +107,30 @@ VERIFY: on a real GSWA NVCL hole, find the Final Mask scalar / mechanism and
 confirm its on/off direction (plot against core photo or spectra) before
 applying it everywhere (plan T1.6).
 
+## T2.1 compositing + interval joins (composite.py, sql/composite_join.sql)
+
+DuckDB-backed, three testable functions in src/hyfuse/composite.py:
+- make_windows(d0,d1,win): fixed [win_from,win_to) windows; windows START at the
+  hole's min masked depth (not 0), last window clipped to max depth.
+- composite_minerals(tidy,win): mean mineral-group abundance per (window,view)
+  over mask-on rows; sample DEPTH MIDPOINT decides window membership.
+- overlap_weight_assays(windows, assays_long): per (window,element) assay mean
+  weighted by overlap length = max(0, min(win_to,a_to)-max(win_from,a_from));
+  value_wmean = sum(value*overlap)/sum(overlap). Zero/boundary overlaps excluded.
+
+Validated on real data:
+- ETG0187 -> 29 window x group rows (KAOLIN/WHITE-MICA/CHLORITE/SULPHATE/INVALID
+  kept explicit; empty-group no-result rows carried as NaN, filtered in T2.3).
+- BBDD0001 (collar 4125323) assays -> 25 x 5 m windows, overlap-weighted Au means.
+Assay long form expected columns: hole_id, depth_from, depth_to, element, value
+(below-detection handling is T2.2 upstream; this module is geometry only).
+
+Tests (tests/test_composite.py, 8): windowing incl. clip/degenerate, midpoint
+membership, mask-off exclusion, and the EXACT straddling-interval overlap case
+(two intervals -> 80/6 = 13.333, not the blind-average 15). 17 tests pass total.
+DASC geology/assay tables: CollarId + FromDepth/ToDepth (assay also MidDepth);
+join key CollarId <- hylogger_dataset_index.WAMEX_CollarId.
+
 ## T1.6 tidy table (implemented: read.py, qc.py, features.py)
 
 Per-hole tidy long Parquet in data/derived/holes/<hole>.parquet, one row per

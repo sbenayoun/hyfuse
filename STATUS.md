@@ -1,4 +1,4 @@
-NEXT ACTION: Day 1 complete (T1.1-T1.7 done, GATE 1 PASS). Day 2 T2.1 — DuckDB SQL to composite HyLogger rows to fixed depth windows (params.yaml window=5 m) and interval-join logged lithology (wamex_dh_geology) + assays (wamex_assay_flat_data) by overlap; add the hand-built mini-hole join test. Also run R1 verification (scope D,E,I) in a fresh session before Day 2.
+NEXT ACTION: T2.2 — assay hygiene: ingest wamex_assay_flat_data for shortlist collars, resolve below-detection (negatives -> |x|/2 per params.assay_hygiene), apply per-element plausibility ranges (flag not drop), melt to long form (hole_id, depth_from/to, element, value), then choose <=3 assay targets by coverage. Compositing geometry (overlap join) is done (T2.1).
 
 # HyFuse status
 
@@ -87,6 +87,12 @@ NEXT ACTION: Day 1 complete (T1.1-T1.7 done, GATE 1 PASS). Day 2 T2.1 — DuckDB
 ##   (negatives=below-detection, Au plausibility cap), F4 accepted (seed wiring
 ##   at T2.4/T3.3). No open FAIL in scope.
 ## Next: Day 2 T2.1 (DuckDB compositing + interval joins).
+
+## Done (T2.1, composite.py + sql/composite_join.sql)
+- make_windows / composite_minerals / overlap_weight_assays (DuckDB).
+- Overlap-weighted assay join tested EXACTLY (straddling interval -> 80/6).
+- Validated on real data: ETG0187 composite (29 rows), BBDD0001 assays (25 win).
+- 17 tests pass. Windows start at hole min-depth; midpoint window membership.
 
 ## Pre-fetched assets (in ../, outside the repo)
 - ../datasets/INTERIM_HyLogger_Dataset_Package_GDA2020_DB.zip (DASC package,
