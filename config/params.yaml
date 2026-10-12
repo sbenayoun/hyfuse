@@ -24,9 +24,21 @@ clr:
 window_size_m: 5.0        # GSWA gold example uses 5 m averaged cut-offs
 min_interval_m: 1.0       # minimum domain interval length (ruptures)
 
-# --- Boundary agreement metric (T2.5) ---
-depth_tolerance_m: 2.0    # placeholder; freeze before scoring
-boundary_metric: f1       # precision / recall / f1 within tolerance
+# --- Boundary agreement metric (T2.5) — PRE-REGISTERED, frozen before results ---
+# Committed BEFORE any scoring/results file exists (verifiable via
+# `git log -p config/params.yaml`). Do not change after seeing results without a
+# written reason in the README.
+depth_tolerance_m: 2.0    # a detected boundary matches a logged boundary if within this
+boundary_metric: f1       # report precision, recall AND f1 within tolerance
+boundary_scoring:
+  match: boundary_within_tolerance   # score BOUNDARIES, not lithology-code equality
+  tolerance_m: 2.0                    # same as depth_tolerance_m (kept explicit)
+  permutation:
+    n: 1000                           # random-boundary baseline draws
+    strategy: same_count_per_hole     # random boundaries, same count as detected, per hole
+  min_logged_intervals: 3             # holes with fewer logged intervals are reported but flagged
+  # Logged boundaries come from wamex_dh_geology interval edges (FromDepth/ToDepth),
+  # company-specific codes -> score interval BOUNDARIES, not code matches.
 
 # --- Cross-validation (T2.5, T3.3) ---
 cv:
