@@ -1,4 +1,4 @@
-NEXT ACTION: T2.8 — minimal Streamlit viewer (app/viewer.py): select a hole -> depth log showing logged units, detected domains/boundaries, and mineral-group stacks. Reads per-hole Parquet via DuckDB. Static Plotly HTML acceptable. Then CUT-LINE check + R2 verification (scope A-F).
+NEXT ACTION: R2 verification (fresh session, scope A-F) at the current commit, then Day 3 T3.1 (planted-truth synth.py: simulate known mineral mixes with view-specific detectability masks; SWIR-active set from params; 97% qtz/3% chlorite case; fused arm must recover truth >= single views). CUT LINE passed (T2.4/T2.5 work) -> fusion stays in.
 
 # HyFuse status
 
@@ -132,6 +132,14 @@ NEXT ACTION: T2.8 — minimal Streamlit viewer (app/viewer.py): select a hole ->
   jump), depth offset (F1 1.0->0.0), mask ignored (rows/metres change), shuffled
   ids (join collapses). New guards: assay_unit_sanity, hole_id_consistency.
 - 53 tests pass.
+
+## Done (T2.8, viewer_core.py + app/viewer.py)
+- Streamlit hole viewer over testable viewer_core; depth log of mineral-group
+  stacks + detected (red) / logged (grey) boundaries; reads Parquet via DuckDB.
+- Boots HTTP 200 on WSL headless. 3 tests. 56 tests pass.
+
+## CUT LINE PASSED: T2.4/T2.5 work -> fusion ablation stays in (Rung 2).
+## DAY 2 COMPLETE (T2.1-T2.8). Next: R2 (fresh session, A-F) then Day 3 T3.1.
 
 ## Pre-fetched assets (in ../, outside the repo)
 - ../datasets/INTERIM_HyLogger_Dataset_Package_GDA2020_DB.zip (DASC package,

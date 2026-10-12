@@ -107,6 +107,23 @@ VERIFY: on a real GSWA NVCL hole, find the Final Mask scalar / mechanism and
 confirm its on/off direction (plot against core photo or spectra) before
 applying it everywhere (plan T1.6).
 
+## T2.8 minimal viewer (viewer_core.py + app/viewer.py)
+
+Logic in src/hyfuse/viewer_core.py (importable/testable); app/viewer.py is a thin
+Streamlit shell. Select hole + view (swir/tir) -> Plotly depth log (y reversed =
+down-hole) of mineral-group stacks, with detected domain boundaries (red solid)
+and logged lithology boundaries (grey dashed, from wamex_dh_geology via optional
+CollarId). Reads per-hole Parquet through DuckDB; composites + domains on the fly
+using params (window, delta, seed, min_interval).
+
+Verified: `uv run streamlit run app/viewer.py --server.headless true` boots and
+serves HTTP 200 on WSL (open in Windows browser). Tests (tests/test_viewer.py,
+3): stacked-bar + logged-line figure, empty-safe, real-ETG0187 integration smoke.
+56 tests pass.
+
+## CUT LINE (end of Day 2): T2.4 (domaining) and T2.5 (boundary agreement) WORK
+(tested) -> stay on course for the fusion ablation (Rung 2). No cut.
+
 ## T2.7 corruption tests (tests/test_corruption.py) + guards (qc.py)
 
 The pipeline must FLAG or visibly DEGRADE on each injected fault; a silent pass
