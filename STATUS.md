@@ -1,4 +1,4 @@
-NEXT ACTION: T1.6 — implement read.py/features.py to produce per-hole tidy depth-aligned Parquet (one row per measurement: hole_id, depth_from/to, view, mineral_group, mineral, abundance, error, final_mask, processing_level, instrument_gen), applying Final Mask (keep==1.0) and nulling the -3.4e38 sentinel; validate on ETG0187.
+NEXT ACTION: T1.7 — coverage audit: generate reports/coverage.md from hylogger_dataset_index (counts of SWIR/TIR/both/FinalMask/logs/assays/petrophysics, by processing level and commodity, total metres after masking), wire it to `make features`, then evaluate GATE 1 (expected PASS: 1124 holes with TIR+assays+logging).
 
 # HyFuse status
 
@@ -56,6 +56,16 @@ NEXT ACTION: T1.6 — implement read.py/features.py to produce per-hole tidy dep
 - wamex_dh_geology has harmonised GSWARockName alongside company codes.
 - wamex_assay_flat_data has ~100 element cols, units explicit (*_PCT / *_PPM);
   join to HyLogger via CollarId <- index.WAMEX_CollarId.
+
+## Done (T1.6, read/qc/features implemented)
+- read.py: TSG hole -> tidy long table; discovers processing suffix per view
+  (swir=sTSAS, tir=sjCLST on ETG0187), nulls -3.4e38 sentinel, keeps explicit
+  states, builds depth_from/to from sampleheaders['D'] half-spacing.
+- qc.py: apply_final_mask (keep==1), mask_summary, metres_after_mask.
+- features.py: writes data/derived/holes/<hole>.parquet; `make features` entry.
+- Validated on ETG0187: 5670 rows, schema per plan, mask 1744/1091 per view,
+  3488 kept after mask, 24.3 kept-metres. 9 tests pass. Known quirk: 233
+  zero-width intervals (shared D), harmless (T2.1 windowing absorbs).
 
 ## Pre-fetched assets (in ../, outside the repo)
 - ../datasets/INTERIM_HyLogger_Dataset_Package_GDA2020_DB.zip (DASC package,

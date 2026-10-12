@@ -107,7 +107,29 @@ VERIFY: on a real GSWA NVCL hole, find the Final Mask scalar / mechanism and
 confirm its on/off direction (plot against core photo or spectra) before
 applying it everywhere (plan T1.6).
 
-## DASC package (T1.5, RESOLVED)
+## T1.6 tidy table (implemented: read.py, qc.py, features.py)
+
+Per-hole tidy long Parquet in data/derived/holes/<hole>.parquet, one row per
+sample x view, columns exactly per plan:
+  hole_id, depth_from, depth_to, view(swir|tir), mineral_group, mineral,
+  abundance, error, final_mask, processing_level, instrument_gen
+  (+ is_explicit_state helper).
+
+Validated on ETG0187: 5670 rows (2835 swir + 2835 tir).
+- Processing suffix DISCOVERED per view (not hardcoded): swir=sTSAS, tir=sjCLST;
+  TSAV family ignored; system-constrained preferred over unconstrained.
+- Sentinel nulling works: abundance in [0.34,1.0], error in [7.3,1973], no
+  -3.4e38; 2201 NaN = masked/no-result rows.
+- Final Mask recorded as a column (NOT pre-filtered) so corruption tests (T2.7)
+  can toggle it; qc.apply_final_mask keeps mask==1 (3488 rows kept on ETG0187).
+- Explicit states (e.g. Aspectral x11) kept, not coerced to missing/zero.
+- Depth from sampleheaders['D']; depth_from/to via half-spacing midpoints.
+  KNOWN QUIRK: 233/2835 zero-width intervals (consecutive samples share the same
+  D value). Harmless; T2.1 composites to fixed windows which absorbs these.
+  ASSUMPTION: 'D' is sample centre (recorded in read.py).
+
+Tests: tests/test_read_qc.py (suffix discovery incl. TSAV-ignore, sentinel
+nulling, half-spacing coverage, mask filtering, metres-after-mask). 9 pass total.
 
 Extracted to data/raw/dasc/ (git-ignored) from
 ../datasets/INTERIM_HyLogger_Dataset_Package_GDA2020_DB.zip:
