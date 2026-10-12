@@ -107,6 +107,28 @@ VERIFY: on a real GSWA NVCL hole, find the Final Mask scalar / mechanism and
 confirm its on/off direction (plot against core photo or spectra) before
 applying it everywhere (plan T1.6).
 
+## T2.2 assay hygiene (implemented in qc.py)
+
+Functions: resolve_below_detection, flag_implausible, assays_wide_to_long.
+- Below-detection: negatives mean "below |x|"; impute |x|/2, keep below_detection
+  flag. (ASSUMPTION |x|/2, ablatable.)
+- Plausibility: flag (never drop) values outside params.assay_hygiene
+  .plausibility_ppm (Au_PPM/As_PPM [0,100000]).
+- Wide DASC assay table -> long (hole_id, depth_from, depth_to, element, value,
+  below_detection, implausible); null measurements dropped; feeds the T2.1
+  overlap_weight_assays directly.
+
+Target selection (recorded in params.assay_targets):
+- Au_PPM ONLY. Shortlist coverage: Au 2362 rows across all 15 holes; Cu/S/K2O/Ag
+  only 3 holes, As 2 holes -> too few for leave-holes-out CV. Honest single
+  gold target. Max Au on shortlist 257 ppm (plausible; no unit errors here).
+  648 below-detection negatives exist across the shortlist (resolved by |x|/2).
+
+Tests (tests/test_assays.py, 6): below-detection halving, plausibility flagging,
+wide->long resolve+flag+null-drop, element restriction, and END-TO-END into the
+overlap join (contiguous intervals -> equal-weight mean 0.401). 23 tests pass.
+Validated on real BBDD0001 Au (124 rows -> 5 m overlap-weighted means).
+
 ## T2.1 compositing + interval joins (composite.py, sql/composite_join.sql)
 
 DuckDB-backed, three testable functions in src/hyfuse/composite.py:

@@ -1,4 +1,4 @@
-NEXT ACTION: T2.2 — assay hygiene: ingest wamex_assay_flat_data for shortlist collars, resolve below-detection (negatives -> |x|/2 per params.assay_hygiene), apply per-element plausibility ranges (flag not drop), melt to long form (hole_id, depth_from/to, element, value), then choose <=3 assay targets by coverage. Compositing geometry (overlap join) is done (T2.1).
+NEXT ACTION: T2.3 — per-view compositional (CLR) features: build per-window mineral-group composition vectors per view (swir, tir separately), apply CLR with a documented zero strategy (zeros = "not detectable in this view", do not impute as trace without recording); never mix SWIR+TIR into one composition. Add tests.
 
 # HyFuse status
 
@@ -93,6 +93,12 @@ NEXT ACTION: T2.2 — assay hygiene: ingest wamex_assay_flat_data for shortlist 
 - Overlap-weighted assay join tested EXACTLY (straddling interval -> 80/6).
 - Validated on real data: ETG0187 composite (29 rows), BBDD0001 assays (25 win).
 - 17 tests pass. Windows start at hole min-depth; midpoint window membership.
+
+## Done (T2.2, assay hygiene in qc.py)
+- resolve_below_detection (neg -> |x|/2 + flag), flag_implausible (flag not drop),
+  assays_wide_to_long (DASC wide -> long for the overlap join).
+- Target = Au_PPM only (2362 rows / all 15 holes; others <=3 holes). params updated.
+- 6 tests incl. end-to-end into overlap join. 23 tests pass. Validated on BBDD0001.
 
 ## Pre-fetched assets (in ../, outside the repo)
 - ../datasets/INTERIM_HyLogger_Dataset_Package_GDA2020_DB.zip (DASC package,

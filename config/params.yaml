@@ -26,7 +26,11 @@ bootstrap:
   unit: hole              # resample over holes, not windows
 
 # --- Assay targets (T2.2); chosen from coverage audit, max 3 ---
-assay_targets: []         # e.g. [Au, As, Fe2O3] — decide from data
+# Chosen from shortlist coverage: Au_PPM is the ONLY element with broad hole
+# coverage (2362 rows across all 15 holes). Cu/S/K2O/Ag exist in only 3 holes
+# and As in 2 -> too few for leave-holes-out CV, so NOT used as targets.
+# Honest single-target choice for a gold shortlist.
+assay_targets: [Au_PPM]
 
 # --- Assay hygiene (T2.2) — rules the ingestion MUST enforce ---
 # R1 reviewer (F3) confirmed on real DASC data: below-detection values are
