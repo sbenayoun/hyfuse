@@ -1,4 +1,4 @@
-NEXT ACTION: T2.4 — per-view domaining: PCA -> HDBSCAN (record params, wire seed) -> depth-aware segmentation with ruptures + min interval length; also a PCA + k-means baseline. Output per hole: domain labels, boundaries, soft membership where available. Add tests. (CLR features T2.3 done.)
+NEXT ACTION: T2.5 — pre-registered boundary agreement. FIRST freeze in params.yaml (and commit) the depth tolerance, metric (precision/recall/F1 within tolerance), and the GroupKFold-by-hole split; THEN implement boundary scoring of detected domain boundaries vs logged rock-type interval boundaries (wamex_dh_geology), with a permutation baseline (random boundaries, same count/hole). Score boundaries not code equality; report logging density per hole.
 
 # HyFuse status
 
@@ -106,6 +106,12 @@ NEXT ACTION: T2.4 — per-view domaining: PCA -> HDBSCAN (record params, wire se
   collide. Zero strategy in params.clr (multiplicative, delta=1e-6, ablatable).
 - 6 tests (exact CLR math, simplex preservation, per-view separation). 29 pass.
 - Validated on ETG0187 (geologically sensible SWIR vs TIR CLR features).
+
+## Done (T2.4, domaining in domains.py)
+- PCA(seed)->HDBSCAN(soft membership)->ruptures Pelt segmentation; +k-means
+  baseline. SEED now wired (closes R1 F4). 5 tests (determinism, planted
+  mid-boundary detection, baseline). 34 tests pass. Runs end-to-end on ETG0187
+  (4 windows -> trivial; needs longer shortlist holes for real domains).
 
 ## Pre-fetched assets (in ../, outside the repo)
 - ../datasets/INTERIM_HyLogger_Dataset_Package_GDA2020_DB.zip (DASC package,

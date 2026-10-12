@@ -107,6 +107,30 @@ VERIFY: on a real GSWA NVCL hole, find the Final Mask scalar / mechanism and
 confirm its on/off direction (plot against core photo or spectra) before
 applying it everywhere (plan T1.6).
 
+## T2.4 per-view domaining (domains.py)
+
+Pipeline per view on the CLR features: StandardScaler -> PCA(seed) -> HDBSCAN
+(soft membership via probabilities_) -> ruptures.Pelt(rbf) change-point
+segmentation into contiguous down-hole domains with a minimum interval length.
+Plus a PCA + k-means baseline (the common spectral approach).
+
+- domain_view(features, seed, n_components, min_cluster_size,
+  min_interval_windows, seg_penalty) -> DomainResult(windows, boundaries,
+  n_components, params). windows gains pc1..pcK, cluster, membership, domain.
+- kmeans_baseline(features, seed, k) -> adds a 'kmeans' label column.
+- SEED now wired into PCA/HDBSCAN/KMeans (closes R1 finding F4; was inert).
+- min_interval_windows derived from params min_interval_m / window_size_m.
+
+Tests (tests/test_domains.py, 5): determinism (same seed -> same labels &
+boundaries), boundary detected near a planted mid-depth regime change on a
+two-block synthetic, params/scores recorded, empty input, k-means determinism.
+34 tests pass.
+
+Real-data note: ETG0187 is only ~10 m -> 4 windows at 5 m, so HDBSCAN marks all
+noise and no boundary is found (correct for so few windows). Meaningful
+domaining needs the longer shortlist holes (BBDD etc.); ETG0187 is only the
+read-path validation hole.
+
 ## T2.3 compositional CLR features (features.py)
 
 Per-view (NEVER pooled) compositional features from the composited mineral-group
