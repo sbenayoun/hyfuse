@@ -1,4 +1,4 @@
-NEXT ACTION: T2.5 — pre-registered boundary agreement. FIRST freeze in params.yaml (and commit) the depth tolerance, metric (precision/recall/F1 within tolerance), and the GroupKFold-by-hole split; THEN implement boundary scoring of detected domain boundaries vs logged rock-type interval boundaries (wamex_dh_geology), with a permutation baseline (random boundaries, same count/hole). Score boundaries not code equality; report logging density per hole.
+NEXT ACTION: T2.6 — confounder check: test whether domains/clusters predict processing_level or instrument_gen better than chance (cross-validated classifier or mutual information, grouped by hole). Write reports/confounders.md. Then T2.7 corruption tests.
 
 # HyFuse status
 
@@ -112,6 +112,14 @@ NEXT ACTION: T2.5 — pre-registered boundary agreement. FIRST freeze in params.
   baseline. SEED now wired (closes R1 F4). 5 tests (determinism, planted
   mid-boundary detection, baseline). 34 tests pass. Runs end-to-end on ETG0187
   (4 windows -> trivial; needs longer shortlist holes for real domains).
+
+## Done (T2.5, boundary agreement in evaluate.py) — PRE-REGISTERED
+- Params FROZEN first (commit 96c0454, params-only) before scoring code.
+- logged_boundaries / match_boundaries (greedy 1-1, tol) / prf /
+  boundary_agreement / permutation_baseline / boundary_agreement_vs_baseline.
+- 9 tests incl. negative control (perfect->p<0.05, wrong->p>0.05). 43 pass.
+- Score boundaries not codes; logged source wamex_dh_geology edges. Full results
+  TABLE deferred to T3.3 (needs fetched holes).
 
 ## Pre-fetched assets (in ../, outside the repo)
 - ../datasets/INTERIM_HyLogger_Dataset_Package_GDA2020_DB.zip (DASC package,

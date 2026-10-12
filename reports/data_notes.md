@@ -107,6 +107,32 @@ VERIFY: on a real GSWA NVCL hole, find the Final Mask scalar / mechanism and
 confirm its on/off direction (plot against core photo or spectra) before
 applying it everywhere (plan T1.6).
 
+## T2.5 boundary agreement (evaluate.py) — PRE-REGISTERED
+
+Params frozen & committed FIRST (commit 96c0454, params-only) before any
+scoring code: depth_tolerance_m=2.0, boundary_metric=f1, permutation n=1000
+same_count_per_hole, min_logged_intervals=3. Verifiable via
+`git log -p config/params.yaml` (pre-registration precedes this code commit).
+
+Functions (score BOUNDARIES, not lithology-code equality):
+- logged_boundaries(from,to): interior edges of contiguous logged intervals
+  (drops hole top/bottom).
+- match_boundaries(detected,truth,tol): greedy 1-1 match within tolerance ->
+  (tp,fp,fn). prf(): precision/recall/f1.
+- boundary_agreement(): detected vs logged within tol.
+- permutation_baseline(): random boundaries, same count, in [d0,d1], n draws.
+- boundary_agreement_vs_baseline(): observed f1 + baseline mean/p95 + one-sided
+  permutation p-value (fraction of random draws with f1 >= observed).
+
+Logged source = wamex_dh_geology FromDepth/ToDepth edges. Logging density varies
+(shortlist 61-281 intervals/hole) -> report per hole (T3.3). Labels often blank;
+irrelevant since we score boundaries.
+
+Tests (tests/test_boundary.py, 9): interior-boundary extraction, exact tolerance
+matching + greedy 1-1, prf values, perfect agreement, permutation runs, and the
+NEGATIVE-CONTROL pair: perfect detection -> p<0.05; mostly-wrong -> p>0.05.
+43 tests pass. Full results TABLE is produced in T3.3 (needs fetched holes).
+
 ## T2.4 per-view domaining (domains.py)
 
 Pipeline per view on the CLR features: StandardScaler -> PCA(seed) -> HDBSCAN
