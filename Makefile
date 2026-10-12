@@ -24,6 +24,7 @@ fetch:  ## T1.4: fetch TSG data for holes in config/holes.yaml (cached, sequenti
 
 features:  ## T1.6/T1.7: tidy depth-aligned tables + coverage audit
 	uv run python -m hyfuse.features
+	uv run python -m hyfuse.coverage
 
 domains:  ## T2.4: per-view domaining
 	uv run python -m hyfuse.domains

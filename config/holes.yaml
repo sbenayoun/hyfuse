@@ -1,9 +1,39 @@
 # config/holes.yaml — pinned hole IDs to work on (T1.1, filled in T1.7).
 #
 # Hard rule: work ONLY on holes listed here. Start with 15-20 holes.
-# Do NOT bulk-download. The coverage audit (T1.7) decides the final set.
+# Do NOT bulk-download. Chosen from the T1.7 coverage audit (reports/coverage.md):
+# headline commodity = GOLD (399 holes with TIR + assays + logging; the largest
+# single-commodity population). GATE 1 = PASS (1294 holes qualify overall).
 #
-# ASSUMPTION: empty for now; populated after the coverage audit shortlists
-# holes with SWIR + TIR + (logs or assays). See AGENT_INSTRUCTIONS.md T1.7.
+# Selection criteria (all satisfied by every hole below):
+#   - TIR present (SCDATE_TIR populated)   [VERIFY usable TIR per hole on fetch]
+#   - Assay_data = 1 and Logging_data = 1
+#   - Level 2 processing (LEV2_REL_D populated)
+#   - Commodity_vocab = 'gold'
+#
+# Most holes are the Bannockburn BBDD/BBRD series (one deposit -> comparable
+# company lithology logging, contiguous WAMEX CollarIds). Three extra holes from
+# other projects give regional spread for leave-holes-out CV / collar grouping.
+# Excluded BBDD0091 (7.2 GB) and BBDD0007 (1.8 GB) to keep downloads modest.
+#
+# NVCL_HoleName matches the THREDDS catalogue entry and fetch.py hole id.
+# WAMEX CollarId (for the assay/geology join) is noted per hole.
 
-holes: []
+holes:
+  # --- Bannockburn gold deposit (BBDD core; ~0.4-0.7 GB each) ---
+  - BBDD0001   # CollarId 4125323
+  - BBDD0002   # CollarId 4125324
+  - BBDD0003   # CollarId 4125325
+  - BBDD0004   # CollarId 4125326
+  - BBDD0005   # CollarId 4125327
+  - BBDD0006   # CollarId 4125328
+  - BBDD0008   # CollarId 4125330
+  - BBDD0009   # CollarId 4125331
+  - BBDD0010   # CollarId 4125332
+  - BBDD0011   # CollarId 4125333
+  - BBRD0056   # CollarId 4125322 (RC, same project; ~0.26 GB)
+  # --- Regional spread (other gold projects) ---
+  - 12DHDD0002 # CollarId 2085822
+  - 15SYDD0003B # CollarId 3845730
+  - 16CADD001  # CollarId 3991008
+  - BCMH0070   # CollarId 5150256
