@@ -28,6 +28,18 @@ bootstrap:
 # --- Assay targets (T2.2); chosen from coverage audit, max 3 ---
 assay_targets: []         # e.g. [Au, As, Fe2O3] — decide from data
 
+# --- Assay hygiene (T2.2) — rules the ingestion MUST enforce ---
+# R1 reviewer (F3) confirmed on real DASC data: below-detection values are
+# encoded as NEGATIVES (49,541/236,719 Au_PPM rows < 0, down to -5000), and
+# Au_PPM reaches 421300 (~42%) which is implausible. T2.2 must handle both.
+assay_hygiene:
+  below_detection: negative_is_censored   # treat x<0 as "< |x|"; impute |x|/2 (ASSUMPTION, ablate)
+  flag_not_drop: true                      # flag implausible values, never silently drop
+  plausibility_ppm:                        # per-element sanity ranges (flag outside)
+    Au_PPM: [0, 100000]                    # 100000 ppm = 10%; above => flag unit/entry error
+    As_PPM: [0, 100000]
+  # VERIFY with a GSWA expert: exact below-detection convention + Au outlier reality.
+
 # --- SWIR-active mineral set for planted-truth sim (T3.1) ---
 # ASSUMPTION: first guess from a GSWA geologist's statement + Spectral
 # Regions slide. SWIR sees hydroxyl-bearing minerals, carbonates, sulfates;

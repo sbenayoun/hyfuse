@@ -79,8 +79,14 @@ NEXT ACTION: Day 1 complete (T1.1-T1.7 done, GATE 1 PASS). Day 2 T2.1 — DuckDB
   the Bannockburn BBDD/BBRD series (one deposit, contiguous CollarIds) + 3
   regional holes for CV spread. Excluded the 7.2 GB / 1.8 GB BBDD outliers.
 
-## DAY 1 COMPLETE (T1.1-T1.7). Commits a55a57e..(this). GATE 1 PASS.
-## Next: R1 verification (fresh session, scope D/E/I) then Day 2 T2.1.
+## DAY 1 COMPLETE (T1.1-T1.7). GATE 1 PASS.
+## R1 verification DONE at commit 1f36dca (fresh session, scope D/E/I):
+##   verdict "Go with fixes", no blockers. See reports/review_R1.md +
+##   reports/review_response.md. F1 FIXED (make fetch guard), F2 partially
+##   fixed (README stub; full at T4.2), F3 recorded in params assay_hygiene
+##   (negatives=below-detection, Au plausibility cap), F4 accepted (seed wiring
+##   at T2.4/T3.3). No open FAIL in scope.
+## Next: Day 2 T2.1 (DuckDB compositing + interval joins).
 
 ## Pre-fetched assets (in ../, outside the repo)
 - ../datasets/INTERIM_HyLogger_Dataset_Package_GDA2020_DB.zip (DASC package,

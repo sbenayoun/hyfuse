@@ -20,7 +20,7 @@ lint:  ## Lint with ruff
 	uv run ruff check .
 
 fetch:  ## T1.4: fetch TSG data for holes in config/holes.yaml (cached, sequential)
-	uv run python -m hyfuse.fetch
+	uv run python -m hyfuse.fetch --max-holes $$(uv run python -c "import yaml;print(len(yaml.safe_load(open('config/holes.yaml'))['holes']))")
 
 features:  ## T1.6/T1.7: tidy depth-aligned tables + coverage audit
 	uv run python -m hyfuse.features
