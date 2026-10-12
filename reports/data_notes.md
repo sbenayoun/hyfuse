@@ -107,6 +107,24 @@ VERIFY: on a real GSWA NVCL hole, find the Final Mask scalar / mechanism and
 confirm its on/off direction (plot against core photo or spectra) before
 applying it everywhere (plan T1.6).
 
+## T2.6 confounder check (evaluate.py)
+
+Does the clustering/domaining just reflect processing_level or instrument_gen
+(not geology)? Two complementary tests, GROUPED BY HOLE (no hole-identity leak):
+- confounder_mutual_information(labels, confounder): observed MI vs a 200x
+  label-shuffle baseline (mi_shuffle_mean / p95).
+- confounder_classifier_auc(features, confounder, groups): GroupKFold logistic
+  regression accuracy vs the majority-class (chance) rate. Degenerate cases
+  (single class / <2 groups) return chance with a note.
+- confounder_report(labels, features, {name: values}, groups): per-confounder
+  summary with flag_confounded = (cv_accuracy > majority+0.10) OR
+  (mi > shuffle_p95 and mi > 0.05).
+
+Tests (tests/test_confounders.py, 6): planted-confounded (labels == confounder ->
+flagged; classifier beats majority) vs planted-clean (independent -> not flagged;
+classifier at chance), degenerate single-class. 49 tests pass. The real
+reports/confounders.md (per arm) is produced in T3.3 with fetched holes.
+
 ## T2.5 boundary agreement (evaluate.py) — PRE-REGISTERED
 
 Params frozen & committed FIRST (commit 96c0454, params-only) before any

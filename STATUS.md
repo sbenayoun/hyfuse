@@ -1,4 +1,4 @@
-NEXT ACTION: T2.6 — confounder check: test whether domains/clusters predict processing_level or instrument_gen better than chance (cross-validated classifier or mutual information, grouped by hole). Write reports/confounders.md. Then T2.7 corruption tests.
+NEXT ACTION: T2.7 — corruption tests (tests/test_corruption.py): the pipeline must FLAG or visibly DEGRADE on each of (a) assays x1000 / ÷1000, (b) depth offset (e.g. +1 m), (c) Final Mask ignored (non-core rows included), (d) hole IDs shuffled between abundance and logs. Each test asserts a raised flag/warning OR a clear metric drop; silent pass = failure.
 
 # HyFuse status
 
@@ -120,6 +120,12 @@ NEXT ACTION: T2.6 — confounder check: test whether domains/clusters predict pr
 - 9 tests incl. negative control (perfect->p<0.05, wrong->p>0.05). 43 pass.
 - Score boundaries not codes; logged source wamex_dh_geology edges. Full results
   TABLE deferred to T3.3 (needs fetched holes).
+
+## Done (T2.6, confounder check in evaluate.py)
+- confounder_mutual_information (vs shuffle), confounder_classifier_auc
+  (GroupKFold vs majority), confounder_report (flag_confounded). Grouped by hole.
+- 6 tests: planted confounded flagged, clean not, degenerate handled. 49 pass.
+- Real reports/confounders.md produced in T3.3.
 
 ## Pre-fetched assets (in ../, outside the repo)
 - ../datasets/INTERIM_HyLogger_Dataset_Package_GDA2020_DB.zip (DASC package,
