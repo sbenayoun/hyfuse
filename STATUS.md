@@ -1,4 +1,4 @@
-NEXT ACTION: T1.2 — dry run on one hole: confirm NCI THREDDS reachable, download one hole zip, unzip, parse with pytsg (NIR + TIR spectra/wavelengths load).
+NEXT ACTION: T1.3 — on a REAL NVCL hole, confirm the Final Mask scalar name and on/off direction, and whether NVCL exposes a cleaner processing-level flag than the column suffixes (sTSAS/sTSAT/uTSAT). TSG read path + mineral/group/error decoding already validated offline.
 
 # HyFuse status
 
@@ -14,7 +14,22 @@ NEXT ACTION: T1.2 — dry run on one hole: confirm NCI THREDDS reachable, downlo
 - DuckDB sqlite extension autoloads (verified).
 - T1.1 scaffold: dir layout, .gitignore (data patterns), config/params.yaml
   (pre-registered), config/holes.yaml (empty), module stubs, Makefile with
-  `make doctor`/`make test`, scripts/doctor.py, smoke test.
+  `make doctor`/`make test`, scripts/doctor.py, smoke test. Commit a55a57e.
+- T1.2 TSG read path validated OFFLINE against pytsg example hole PE257D
+  (scripts/explore_tsg.py): nir(380-2500nm)/tir(5350-15000nm) spectra +
+  wavelengths load; mineral results decode to names; depth in sampleheaders.D.
+- THREDDS catalogue reachable (HTTP 200).
+- reports/data_notes.md written with T1.2/T1.3 findings (see Decided/Found).
+
+## Found (T1.2/T1.3, see reports/data_notes.md)
+- pytsg decodes Min1/Grp1 to mineral NAME strings; no manual code lookup needed
+  for TSG results. Grp1 = harmonised groups (WHITE-MICA, SILICA, KAOLIN, ...).
+- Column convention: SWIR=sTSAS (ignore sTSAV), TIR=sTSAT/uTSAT. Error=confidence.
+- aspectral/invalid/MaskedOff appear as explicit Min1/Grp1 class values.
+- CRITICAL: Wt1/Error carry float32 null sentinel -3.4e38 on masked rows ->
+  must null before stats (feeds qc.py + corruption tests T2.7).
+- Depth = sampleheaders['D'] (metres).
+- Final Mask: no standalone column in the CSIRO example; VERIFY on a real NVCL hole.
 
 ## Pre-fetched assets (in ../, outside the repo)
 - ../datasets/INTERIM_HyLogger_Dataset_Package_GDA2020_DB.zip (DASC package,
