@@ -67,3 +67,18 @@ def test_confounders_markdown_returns_report_or_notice():
     md = viewer_core.confounders_markdown()
     assert isinstance(md, str) and len(md) > 0
     assert ("confounder" in md.lower()) or ("make evaluate" in md.lower())
+
+
+def test_export_hole_writes_html(tmp_path):
+    # Only runs if a derived hole exists; otherwise skip gracefully.
+    holes = viewer_core.available_holes()
+    if not holes:
+        return
+    hole = holes[0]
+    path = viewer_core.export_hole(hole, str(tmp_path), view="swir")
+    assert path.endswith(".html")
+    import os
+    assert os.path.getsize(path) > 0
+    with open(path) as fh:
+        head = fh.read(5000)
+    assert "plotly" in head.lower() or "Plotly" in head

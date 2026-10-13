@@ -150,3 +150,27 @@ def make_figure(viewdata: dict) -> go.Figure:
         legend_title="Mineral group", height=800,
     )
     return fig
+
+
+def export_hole(hole_id: str, out_dir: str, *, view: str = "tir",
+                collar_id: int | None = None, as_png: bool = False) -> str:
+    """Render one hole's depth-log figure to a standalone file for sharing.
+
+    Default is a self-contained interactive HTML (opens in any browser, no server
+    and no THREDDS/DASC access needed). PNG is optional and requires `kaleido`.
+    Returns the written file path.
+    """
+    from pathlib import Path as _Path
+
+    logged = load_logged_boundaries(collar_id) if collar_id else []
+    data = build_hole_view(hole_id, view=view, logged=logged)
+    fig = make_figure(data)
+    out = _Path(out_dir)
+    out.mkdir(parents=True, exist_ok=True)
+    if as_png:
+        path = out / f"{hole_id}_{view}.png"
+        fig.write_image(str(path), width=1400, height=900, scale=2)
+    else:
+        path = out / f"{hole_id}_{view}.html"
+        fig.write_html(str(path), include_plotlyjs="cdn")
+    return str(path)

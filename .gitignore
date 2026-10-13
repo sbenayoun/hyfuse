@@ -34,3 +34,6 @@ __pycache__/
 
 # Pitch deck / any PDF: form attachments, never commit
 *.pdf
+
+# Generated per-hole review figures (derived outputs, share directly)
+review_figs/

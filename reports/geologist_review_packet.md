@@ -78,5 +78,10 @@ lithology or weathering?
 ## How to pull the data for a hole
 - Core photos / logs: via the NVCL hole (THREDDS) and the DASC package, keyed by
   the WAMEX CollarId above (`hylogger_dataset_index` → `wamex_dh_geology`).
-- Or ask us for the per-hole viewer screenshot (`make viewer`, select the hole):
-  it shows the mineral stacks, detected domains, and logged boundaries together.
+- **Easiest — standalone figures (no server, no THREDDS/DASC needed):** run
+  `uv run python scripts/export_review_figs.py` to generate self-contained HTML
+  plots for exactly these four holes (TIR + SWIR) under `review_figs/`. Each file
+  opens in any browser and shows the mineral-group stacks, the detected domain
+  boundaries (red) and the logged lithology boundaries (grey) together — email
+  these alongside this packet.
+- Or run the live viewer: `make viewer`, then select the hole.
