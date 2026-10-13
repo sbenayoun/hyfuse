@@ -1,4 +1,4 @@
-NEXT ACTION: T4.3 — clean-clone reproduction (fresh checkout -> uv sync -> make features && make evaluate reproduces reports; document fetch size) + R4 (final review, all A-J, fresh session). Then T4.4 submission checklist, T4.5 pitch slides. T4.1 viewer ablation tab DONE. GitHub repo live + pushed.
+NEXT ACTION: R4 — FINAL review (fresh session, all A-J, incl. clean-clone reproduction which is now demonstrated in reports/reproduction.md). Then T4.4 submission checklist, T4.5 pitch slides, submit via GSWA form. T4.3 PASSED: fresh clone of public repo reproduces reports BIT-FOR-BIT; 75 tests pass; DOCTOR OK. Repo pushed c449c87.
 
 # HyFuse status
 
