@@ -54,3 +54,16 @@ def test_build_hole_view_on_real_etg0187_if_present():
     assert not data["composited"].empty
     fig = viewer_core.make_figure(data)
     assert isinstance(fig, go.Figure)
+
+
+def test_ablation_markdown_returns_report_or_notice():
+    md = viewer_core.ablation_markdown()
+    assert isinstance(md, str) and len(md) > 0
+    # if the real report exists it should mention the ablation; else a notice
+    assert ("ablation" in md.lower()) or ("make evaluate" in md.lower())
+
+
+def test_confounders_markdown_returns_report_or_notice():
+    md = viewer_core.confounders_markdown()
+    assert isinstance(md, str) and len(md) > 0
+    assert ("confounder" in md.lower()) or ("make evaluate" in md.lower())

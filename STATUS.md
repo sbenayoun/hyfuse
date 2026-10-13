@@ -1,4 +1,4 @@
-NEXT ACTION: T4.1 viewer ablation tab (add an ablation-summary view to the Streamlit app reading reports/ablation.md). Then T4.3 clean-clone reproduction + R4 (final, all A-J), T4.4 submission checklist, T4.5 pitch slides. T4.2 README DONE (clears R3 F1/F3; VERIFY team name/members/captain + screenshot). LICENSE (MIT) added.
+NEXT ACTION: T4.3 — clean-clone reproduction (fresh checkout -> uv sync -> make features && make evaluate reproduces reports; document fetch size) + R4 (final review, all A-J, fresh session). Then T4.4 submission checklist, T4.5 pitch slides. T4.1 viewer ablation tab DONE. GitHub repo live + pushed.
 
 # HyFuse status
 

@@ -25,6 +25,24 @@ ROOT = Path(__file__).resolve().parent.parent.parent
 DERIVED_HOLES = ROOT / "data" / "derived" / "holes"
 PARAMS = ROOT / "config" / "params.yaml"
 DASC_SQLITE = ROOT / "data" / "raw" / "dasc" / "HyLogger_Dataset_Package.sqlite"
+REPORTS = ROOT / "reports"
+
+
+def ablation_markdown() -> str:
+    """Raw generated ablation report (reports/ablation.md), or a notice."""
+    p = REPORTS / "ablation.md"
+    if not p.exists():
+        return ("_No `reports/ablation.md` yet — run `make evaluate` to generate "
+                "the four-arm ablation._")
+    return p.read_text()
+
+
+def confounders_markdown() -> str:
+    """Raw generated confounder report (reports/confounders.md), or a notice."""
+    p = REPORTS / "confounders.md"
+    if not p.exists():
+        return "_No `reports/confounders.md` yet — run `make evaluate`._"
+    return p.read_text()
 
 
 def available_holes() -> list[str]:
