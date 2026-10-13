@@ -1,4 +1,4 @@
-NEXT ACTION: T3.4 reviewer calibration (planted-flaw test on throwaway branch) + R3 (fresh session, all items A-J). T3.3 real ablation DONE: INCONCLUSIVE (fused F1 0.140 vs TIR 0.139, bootstrap CI incl zero); no Au cross-hole skill (median R2<=0). reports/ablation.md + confounders.md generated. 66 tests pass.
+NEXT ACTION: Fix the two REAL findings the T3.4 calibration surfaced on main before R3: F5 (pass processing_level to confounder_report, say so if constant) and F7 (test asserting assay CV is grouped-by-hole + tolerance-matches-preregistered guard). Then R3 (fresh session, all A-J). T3.4 PASSED 3/3.
 
 # HyFuse status
 
@@ -163,6 +163,15 @@ Confounder: instrument_gen constant (all HL3+) -> degenerate=chance, not flagged
 confounders.md are small committable outputs.
 
 ## DAY 2 COMPLETE (T2.1-T2.8). R1+R2 passed.
+
+## Done (T3.4 reviewer calibration) — reports/calibration.md + calibration_review.md
+- Throwaway `calibration` branch: planted 3 flaws (window-level KFold leak;
+  x1000 Au on BBDD0005; post-hoc tolerance 2->4). Fresh reviewer caught ALL 3
+  as blockers with executed evidence, no false alarms -> review process trusted
+  for R3/R4. Branch deleted (never merged); main (4f2c1c5) untouched.
+- BONUS real findings on main to fix before R3: F5 (confounder omits
+  processing_level), F7 (tests miss grouped-CV / modest-scaling / tolerance
+  guard), F4 (leak silently hid the honest 'no Au skill' line).
 
 ## Done (T3.1 planted-truth + T3.2 arms) — see reports/planted_truth.md
 - synth.py: known-truth sim, view-specific detectability; 97/3 qtz/chl case OK.
