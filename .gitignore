@@ -31,3 +31,6 @@ __pycache__/
 
 # --- Allow small derived outputs under reports/ (figures, tables) ---
 # reports/ is intentionally NOT ignored; keep only small files there.
+
+# Pitch deck / any PDF: form attachments, never commit
+*.pdf
