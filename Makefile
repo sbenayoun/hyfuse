@@ -33,7 +33,7 @@ fusion:  ## T3.2: four-arm ablation feature matrices
 	uv run python -m hyfuse.fusion
 
 evaluate:  ## T3.3: score all arms, write reports/ablation.md
-	uv run python -m hyfuse.evaluate
+	uv run python -m hyfuse.ablation
 
 viewer:  ## T2.8/T4.1: launch the Streamlit hole viewer
 	uv run streamlit run app/viewer.py --server.headless true

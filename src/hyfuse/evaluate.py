@@ -19,12 +19,17 @@ T3.3 full ablation is added later.
 
 from __future__ import annotations
 
+import logging
+
 import numpy as np
-from sklearn.linear_model import LogisticRegression
+import pandas as pd
+from sklearn.linear_model import LogisticRegression, Ridge
 from sklearn.metrics import mutual_info_score
 from sklearn.model_selection import GroupKFold, cross_val_score
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
+
+log = logging.getLogger("hyfuse.evaluate")
 
 
 def logged_boundaries(from_depth, to_depth) -> list[float]:
@@ -38,6 +43,21 @@ def logged_boundaries(from_depth, to_depth) -> list[float]:
     if len(edges) <= 2:
         return []
     return edges[1:-1]
+
+
+def snap_to_grid(boundaries, win: float, origin: float = 0.0) -> list[float]:
+    """Snap boundaries to the window grid (resolution floor) and dedupe.
+
+    Logged lithology is often far finer than the window size; the pipeline
+    cannot resolve boundaries below `win`. Snapping both logged and detected
+    boundaries to grid-cell starts makes the comparison fair at our resolution
+    and collapses sub-window-spaced logged boundaries to the windows they fall
+    in (this is the 'logging density' adjustment the plan calls for)."""
+    if win <= 0:
+        return sorted({float(b) for b in boundaries if np.isfinite(b)})
+    snapped = {origin + round((float(b) - origin) / win) * win
+               for b in boundaries if np.isfinite(b)}
+    return sorted(snapped)
 
 
 def match_boundaries(detected, truth, tol: float) -> tuple[int, int, int]:
@@ -217,3 +237,71 @@ def confounder_report(labels, features, confounders: dict,
         )
         report[name] = {**mi, **auc, "flag_confounded": bool(flag)}
     return report
+
+
+# --------------------------------------------------------------------------- #
+# T3.3 assay-target prediction (leave-holes-out) + hole-level bootstrap
+# --------------------------------------------------------------------------- #
+
+def assay_prediction_cv(features: pd.DataFrame, target: pd.Series,
+                        groups, *, seed: int = 42,
+                        n_splits: int = 5) -> dict[str, float]:
+    """Leave-holes-out CV R^2 for predicting an assay target from arm features.
+
+    GroupKFold by hole; a StandardScaler+Ridge pipeline inside the CV (stable in
+    the small-sample / near-constant-column regime where HistGBR fails). Returns
+    mean/std CV R^2 and n. log1p-transforms the non-negative, skewed target.
+    """
+    x = features.to_numpy(dtype=float)
+    y = np.log1p(np.asarray(target, dtype=float).clip(min=0))
+    g = np.asarray(groups)
+    n_groups = len(set(g.tolist()))
+    out = {"n": len(y), "n_groups": n_groups}
+    if n_groups < 2 or len(y) < 10:
+        out["note"] = "too few holes/rows for grouped CV"
+        out["r2_mean"] = float("nan")
+        return out
+    k = max(2, min(n_splits, n_groups))
+    # Strong regularisation: features are many and collinear vs few holes, so a
+    # weakly-regularised fit overfits per fold and gives absurd negative R^2.
+    # alpha=100 is an honest ridge for this p-vs-n regime (reported, not tuned to
+    # a target). RidgeCV over a small grid would be a later refinement.
+    model = Pipeline([
+        ("scaler", StandardScaler()),
+        ("ridge", Ridge(alpha=100.0)),
+    ])
+    try:
+        scores = cross_val_score(model, x, y, groups=g,
+                                 cv=GroupKFold(n_splits=k), scoring="r2")
+        out["r2_mean"] = float(scores.mean())
+        out["r2_median"] = float(np.median(scores))
+        out["r2_std"] = float(scores.std())
+        out["r2_folds"] = [float(s) for s in scores]
+        # honest skill flag: positive median R^2 across held-out holes
+        out["has_skill"] = bool(np.median(scores) > 0)
+    except ValueError as exc:
+        out["note"] = f"cv failed: {exc}"
+        out["r2_mean"] = float("nan")
+    return out
+
+
+def bootstrap_hole_delta(per_hole_a: dict[str, float],
+                         per_hole_b: dict[str, float], *,
+                         n: int = 1000, seed: int = 42) -> dict[str, float]:
+    """Hole-level bootstrap of the mean difference (arm_a - arm_b) of a per-hole
+    metric. Resamples HOLES (not windows). Returns mean delta and a 95% CI; the
+    CI excluding zero is the pre-registered success signal."""
+    holes = sorted(set(per_hole_a) & set(per_hole_b))
+    deltas = np.array([per_hole_a[h] - per_hole_b[h] for h in holes
+                       if np.isfinite(per_hole_a[h]) and np.isfinite(per_hole_b[h])])
+    if len(deltas) < 2:
+        return {"delta_mean": float("nan"), "ci_low": float("nan"),
+                "ci_high": float("nan"), "n_holes": len(deltas),
+                "excludes_zero": False}
+    rng = np.random.default_rng(seed)
+    boot = np.array([rng.choice(deltas, size=len(deltas), replace=True).mean()
+                     for _ in range(n)])
+    lo, hi = np.percentile(boot, [2.5, 97.5])
+    return {"delta_mean": float(deltas.mean()), "ci_low": float(lo),
+            "ci_high": float(hi), "n_holes": len(deltas),
+            "excludes_zero": bool(lo > 0 or hi < 0)}

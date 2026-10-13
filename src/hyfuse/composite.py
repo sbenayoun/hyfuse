@@ -37,10 +37,13 @@ def make_windows(d0: float, d1: float, win: float, hole_id: str = "") -> pd.Data
     return pd.DataFrame({"hole_id": hole_id, "win_from": starts, "win_to": ends})
 
 
-def composite_minerals(tidy: pd.DataFrame, win: float) -> pd.DataFrame:
+def composite_minerals(tidy: pd.DataFrame, win: float,
+                       origin: float | None = None) -> pd.DataFrame:
     """Mean mineral-group abundance per (window, view) over mask-on rows.
 
     Membership: a sample belongs to the window containing its depth midpoint.
+    `origin` fixes the window grid start (default 0.0 = collar) so that features
+    and assays for the same hole share ONE grid and their window indices align.
     Returns columns: hole_id, win_from, win_to, view, mineral_group,
     mean_abundance, n_samples.
     """
@@ -51,9 +54,9 @@ def composite_minerals(tidy: pd.DataFrame, win: float) -> pd.DataFrame:
             "mean_abundance", "n_samples",
         ])
     hole_id = str(masked["hole_id"].iloc[0])
-    d0 = float(masked["depth_from"].min())
+    o = 0.0 if origin is None else float(origin)
     d1 = float(masked["depth_to"].max())
-    windows = make_windows(d0, d1, win, hole_id)
+    windows = make_windows(o, d1, win, hole_id)
 
     con = duckdb.connect()
     con.register("tidy", masked)

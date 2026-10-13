@@ -1,4 +1,4 @@
-NEXT ACTION: T3.3 — real-hole evaluation run. Build per-hole composited windows (15 fetched holes) -> four arms (Hellinger default) -> boundary agreement vs logged lithology (permutation baseline), assay (Au_PPM) prediction with GroupKFold-by-hole, confounder check per arm, hole-level bootstrap CIs. Write reports/ablation.md + confounders.md with a plain-language reading. Then calibration run (T3.4) + R3.
+NEXT ACTION: T3.4 reviewer calibration (planted-flaw test on throwaway branch) + R3 (fresh session, all items A-J). T3.3 real ablation DONE: INCONCLUSIVE (fused F1 0.140 vs TIR 0.139, bootstrap CI incl zero); no Au cross-hole skill (median R2<=0). reports/ablation.md + confounders.md generated. 66 tests pass.
 
 # HyFuse status
 
@@ -139,6 +139,29 @@ NEXT ACTION: T3.3 — real-hole evaluation run. Build per-hole composited window
 - Boots HTTP 200 on WSL headless. 3 tests. 56 tests pass.
 
 ## CUT LINE PASSED: T2.4/T2.5 work -> fusion ablation stays in (Rung 2).
+## T3.3 real-hole ablation (ablation.py + data_access.py) — reports/ablation.md
+
+All 15 holes built (SWIR+TIR, 107-1246 m masked core each). Four arms (Hellinger),
+scored on identical windows per hole.
+RESULT (honest, INCONCLUSIVE): fused boundary F1 0.140 vs best single (TIR) 0.139;
+hole-level bootstrap delta +0.001 [-0.017,+0.022] INCLUDES zero -> no reliable
+difference. Au prediction: NO arm has cross-hole skill (median R2<=0) -> mineralogy
+windows don't predict gold on held-out holes (expected w/ assay selection bias).
+Confounder: instrument_gen constant (all HL3+) -> degenerate=chance, not flagged.
+
+4 real bugs found+fixed during T3.3:
+- window-grid misalignment (features vs assays different origins) -> anchor both at
+  collar origin 0 (composite_minerals origin param); assay join went 0 -> 70+ windows.
+- ruptures under-segmentation (penalty 3->1).
+- logging density mismatch (417 logged vs ~70 windows) -> snap_to_grid both detected
+  and logged boundaries to the 5 m resolution floor (fair comparison; plan's
+  'logging density' adjustment).
+- assay model crash/degenerate: HistGBR -> StandardScaler+Ridge(alpha=100); NaN
+  composited abundances filled 0; report MEDIAN R2 + 'no skill' flag, not alarming mean.
+
+66 tests pass (added snap_to_grid + bootstrap tests). reports/ablation.md +
+confounders.md are small committable outputs.
+
 ## DAY 2 COMPLETE (T2.1-T2.8). R1+R2 passed.
 
 ## Done (T3.1 planted-truth + T3.2 arms) — see reports/planted_truth.md

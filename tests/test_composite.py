@@ -44,11 +44,11 @@ def test_composite_minerals_midpoint_membership():
         "final_mask": [1, 1, 1],
     })
     out = composite_minerals(tidy, win=5.0)
-    # Windows start at the data's min depth (0.5), not 0.0:
-    #   window [0.5,5.5) KAOLIN: mean(0.4,0.6)=0.5 n=2
-    #   window [5.5,6.5) SILICA: 1.0 n=1   (sample mids 1.0,1.5 and 6.0)
-    k = out[(out["win_from"] == 0.5) & (out["mineral_group"] == "KAOLIN")]
-    s = out[(out["win_from"] == 5.5) & (out["mineral_group"] == "SILICA")]
+    # Windows anchored at origin 0 (collar), so [0,5) and [5,10):
+    #   window [0,5) KAOLIN: mean(0.4,0.6)=0.5 n=2 (sample mids 1.0, 1.5)
+    #   window [5,6.5) SILICA: 1.0 n=1 (sample mid 6.0)
+    k = out[(out["win_from"] == 0.0) & (out["mineral_group"] == "KAOLIN")]
+    s = out[(out["win_from"] == 5.0) & (out["mineral_group"] == "SILICA")]
     assert float(k["mean_abundance"].iloc[0]) == 0.5
     assert int(k["n_samples"].iloc[0]) == 2
     assert float(s["mean_abundance"].iloc[0]) == 1.0
