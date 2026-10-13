@@ -43,11 +43,15 @@ def _hole_viewer() -> None:
         )
         return
 
+    # Default to a data-rich hole so the first view (and screenshots) look good.
+    preferred = ["16CADD001", "15SYDD0003B", "12DHDD0002", "BCMH0070"]
+    default_idx = next((holes.index(h) for h in preferred if h in holes), 0)
+
     col1, col2, col3 = st.columns(3)
     with col1:
-        hole = st.selectbox("Hole", holes)
+        hole = st.selectbox("Hole", holes, index=default_idx)
     with col2:
-        view = st.radio("View", ["swir", "tir"], horizontal=True)
+        view = st.radio("View", ["tir", "swir"], horizontal=True)
     with col3:
         collar = st.text_input("WAMEX CollarId (optional, for logged boundaries)")
 

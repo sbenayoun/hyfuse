@@ -1,3 +1,21 @@
+---
+marp: true
+theme: default
+paginate: true
+title: "HyFuse — SWIR+TIR fusion (GSWA Hackathon 2026)"
+---
+
+# HyFuse
+## View-aware fusion of SWIR + TIR HyLogger mineralogy
+
+GSWA HyLogger Hackathon 2026 · **Data Crunch**
+Team: HyFuse Team · github.com/sbenayoun/hyfuse
+
+<!-- Speaker notes: this is the title slide. Convert with
+     `marp reports/pitch.md -o pitch.pdf` (needs: npx @marp-team/marp-cli). -->
+
+---
+
 # HyFuse — pitch deck (T4.5)
 
 *Speaker-ready outline. Build to PDF (max 25 MB) for the submission form — e.g.

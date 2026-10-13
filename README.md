@@ -150,8 +150,13 @@ MIT — see `LICENSE`.
 
 ## Screenshots / demo
 
-`VERIFY: add a viewer screenshot (make viewer) and optional short screen
-recording before submission (T4.5).`
+The interactive viewer (`make viewer`) — hole depth log with mineral-group
+stacks, detected domain boundaries (red) and logged lithology boundaries (grey),
+plus an **Ablation summary** tab showing the generated results:
+
+![HyFuse viewer](docs/viewer.png)
+
+*(If the image is missing, run `make viewer` and open http://localhost:8501.)*
 
 ## Reproducing the figures
 
