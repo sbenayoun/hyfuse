@@ -45,6 +45,13 @@ def run_ablation(*, transform: str | None = None,
     win = float(params["window_size_m"])
     seed = int(params["seed"])
     tol = float(params["depth_tolerance_m"])
+    # Guard: scored tolerance must match the pre-registered value (F7). A
+    # post-hoc change without a documented override is logged loudly.
+    tol_guard = ev.preregistered_tolerance_ok(tol)
+    if not tol_guard["ok"]:
+        log.warning("SCORED TOLERANCE %.3f != pre-registered %.3f with no "
+                    "override reason — post-hoc change (checklist B).",
+                    tol_guard["scored"], tol_guard["preregistered"])
     n_perm = int(params["boundary_scoring"]["permutation"]["n"])
     targets = params["assay_targets"]
     plaus = params["assay_hygiene"]["plausibility_ppm"]
@@ -61,6 +68,7 @@ def run_ablation(*, transform: str | None = None,
     arm_labels = {a: [] for a in ARMS}        # per-window domain label (for confounder)
     arm_groups = {a: [] for a in ARMS}
     arm_instr = {a: [] for a in ARMS}
+    arm_tirproc = {a: [] for a in ARMS}   # TIR processing level (varies: sTSAT vs sjCLST)
     assay_rows = {a: [] for a in ARMS}        # (features aligned to assay windows)
     assay_y = {a: [] for a in ARMS}
     assay_groups = {a: [] for a in ARMS}
@@ -78,10 +86,14 @@ def run_ablation(*, transform: str | None = None,
         # snap logged boundaries to the window grid (resolution floor); fair
         # comparison at our 5 m scale given very fine company logging.
         truth_bnd = ev.snap_to_grid(truth_bnd, win, origin=0.0)
-        # per-hole processing_level / instrument_gen (constant within hole here)
+        # per-hole confounders. instrument_gen is constant (all HL3+) and SWIR
+        # processing is constant (sTSAS) across the shortlist, but TIR processing
+        # level genuinely varies (sTSAT vs sjCLST) -> a real confounder axis.
         tidy = tidy_meta_cache.get(hole) or da.load_tidy(hole)
         tidy_meta_cache[hole] = tidy
         instr = str(tidy["instrument_gen"].iloc[0])
+        tir_proc_series = tidy[tidy["view"] == "tir"]["processing_level"]
+        tir_proc = str(tir_proc_series.iloc[0]) if len(tir_proc_series) else "unknown"
 
         wa = da.windowed_assays(hole, collar, win, targets, plaus)
         au_target = targets[0]
@@ -109,6 +121,7 @@ def run_ablation(*, transform: str | None = None,
             arm_labels[arm].append(w["domain"].to_numpy())
             arm_groups[arm].append(np.full(len(w), hole))
             arm_instr[arm].append(np.full(len(w), instr))
+            arm_tirproc[arm].append(np.full(len(w), tir_proc))
 
             # assay prediction rows: align arm features to assay windows
             if not wa_t.empty:
@@ -136,9 +149,27 @@ def run_ablation(*, transform: str | None = None,
             labels = np.concatenate(arm_labels[arm])
             groups = np.concatenate(arm_groups[arm])
             instr = np.concatenate(arm_instr[arm])
-            confounder_result[arm] = ev.confounder_report(
+            tirp = np.concatenate(arm_tirproc[arm])
+            # Only test confounders that actually VARY across holes; a constant
+            # confounder is degenerate and gives false reassurance (R2/calibration
+            # F5). Report the constant ones explicitly as 'not testable'.
+            confounders = {}
+            constant = {}
+            for name, vals in (("instrument_gen", instr),
+                               ("tir_processing_level", tirp)):
+                # vary across HOLES, not just windows
+                per_hole = {g: v for g, v in zip(groups, vals, strict=False)}
+                if len(set(per_hole.values())) >= 2:
+                    confounders[name] = vals
+                else:
+                    constant[name] = next(iter(set(vals.tolist())), "unknown")
+            rep = ev.confounder_report(
                 labels, feats_all.to_numpy(dtype=float),
-                {"instrument_gen": instr}, groups, seed=seed)
+                confounders, groups, seed=seed) if confounders else {}
+            for name, val in constant.items():
+                rep[name] = {"flag_confounded": False, "constant_value": val,
+                             "note": "constant across shortlist; control cannot run"}
+            confounder_result[arm] = rep
 
     # ---- fused vs best-single bootstrap on boundary F1 ------------------------
     def _mean(d):
@@ -162,6 +193,7 @@ def run_ablation(*, transform: str | None = None,
         "best_single": best_single,
         "fused_vs_best_single_bootstrap": boot,
         "n_holes": len(holes),
+        "tolerance_guard": tol_guard,
     }
     if write:
         _write_reports(results)
@@ -247,17 +279,32 @@ def _write_reports(results: dict) -> None:
 
     # confounders.md
     clines = ["# Confounder check per arm (T3.3)\n",
-              ("Does the domaining reflect instrument_gen rather than geology? "
-               "Grouped by hole; flag = predicted above chance.\n"),
-              "| arm | instrument_gen flagged? | cv_accuracy | majority | MI |",
-              "|---|---|---:|---:|---:|"]
+              ("Do the detected domains reflect a technical confounder "
+               "(processing level / instrument generation) rather than geology? "
+               "Grouped by hole; flag = predicted above chance. A confounder that "
+               "is CONSTANT across the shortlist cannot be tested and is marked "
+               "so (not a pass).\n"),
+              "| arm | confounder | status | cv_accuracy | majority | MI |",
+              "|---|---|---|---:|---:|---:|"]
     for a in ARMS:
-        c = results["confounders"].get(a, {}).get("instrument_gen")
-        if not c:
-            clines.append(f"| {a} | n/a | | | |")
+        creps = results["confounders"].get(a, {})
+        if not creps:
+            clines.append(f"| {a} | — | no data | | | |")
             continue
-        clines.append(f"| {a} | {c['flag_confounded']} | {c['cv_accuracy']:.3f} "
-                      f"| {c['majority_rate']:.3f} | {c['mi']:.3f} |")
+        for name, c in creps.items():
+            if "constant_value" in c:
+                clines.append(f"| {a} | {name} | constant "
+                              f"({c['constant_value']}) — not testable | | | |")
+            else:
+                flag = "FLAGGED" if c["flag_confounded"] else "ok (not flagged)"
+                clines.append(f"| {a} | {name} | {flag} | {c['cv_accuracy']:.3f} "
+                              f"| {c['majority_rate']:.3f} | {c['mi']:.3f} |")
+    clines += ["\n## Notes\n",
+               ("- `tir_processing_level` genuinely varies across the shortlist "
+                "(sTSAT on 2 holes, sjCLST on 13) → a real, testable confounder."),
+               ("- `instrument_gen` (all HL3+) and SWIR processing (all sTSAS) are "
+                "constant across the 15 pinned Level-2 holes → cannot be tested "
+                "here; reported as constant, not as a pass.")]
     (REPORTS / "confounders.md").write_text("\n".join(clines) + "\n")
 
 

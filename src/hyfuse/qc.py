@@ -179,3 +179,28 @@ def hole_id_consistency(abundance: pd.DataFrame, other: pd.DataFrame,
             "n_overlap": len(inter),
             "consistent": len(inter) > 0,
             "overlap_fraction": (len(inter) / max(1, len(a | b)))}
+
+
+def inter_hole_outlier_holes(long_assays: pd.DataFrame, element: str,
+                             *, factor: float = 50.0) -> list[str]:
+    """Flag holes whose median assay is wildly out of line with the others.
+
+    Catches a modest per-hole scaling error (e.g. one hole x1000) that stays
+    UNDER the absolute plausibility cap and so is not caught by flag_implausible.
+    A hole is flagged if its median target value is > `factor` x the global
+    median of all OTHER holes' medians (robust to one bad hole). Returns the
+    flagged hole_ids. (R2/calibration finding F7.)
+    """
+    g = long_assays[long_assays["element"] == element]
+    if g.empty or "hole_id" not in g.columns:
+        return []
+    med = g.groupby("hole_id")["value"].median()
+    if len(med) < 3:
+        return []
+    flagged = []
+    for hole, m in med.items():
+        others = med.drop(hole)
+        ref = others.median()
+        if ref > 0 and m > factor * ref:
+            flagged.append(str(hole))
+    return flagged

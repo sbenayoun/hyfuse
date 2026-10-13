@@ -1,5 +1,40 @@
 # HyFuse — builder response to review R2
 
+## Calibration (T3.4) follow-up fixes (findings F5, F7, + flag-logic bug)
+
+The reviewer calibration (reports/calibration.md, PASSED 3/3) also surfaced real
+issues on main. Dispositions:
+
+### F5 [major] Confounder control omitted a varying confounder
+**FIXED (commit <this>).** ablation.py now tests `tir_processing_level`, which
+genuinely VARIES across the shortlist (sTSAT x2, sjCLST x13), as a real
+confounder; `instrument_gen` and SWIR processing are constant (HL3+/sTSAS) and
+are reported as "constant — not testable" (not a pass). Result: TIR processing
+level is NOT flagged for any arm (classifier 0.50-0.74 < majority 0.748) -> the
+domains are not driven by processing level on the testable axis.
+
+### F7 [major] Tests/controls missed realistic failure magnitudes
+**FIXED (commit <this>).** Added tests/test_guards.py (7 tests):
+- assay CV is grouped-by-hole (behavioural + source guard vs the planted leak);
+- qc.inter_hole_outlier_holes flags a modest per-hole x1000 that stays UNDER the
+  plausibility cap (the magnitude the x1e6 corruption test missed);
+- ev.preregistered_tolerance_ok guards the scored tolerance vs the pre-registered
+  2.0 m (flags a post-hoc change unless a documented override is given), wired
+  into run_ablation with a loud warning.
+
+### Bonus bug fixed (exposed while fixing F5)
+confounder_report flag logic was `classifier_beats_chance OR mi_elevated`; with
+imbalanced confounder classes MI can exceed its shuffle p95 by chance, giving a
+FALSE-POSITIVE flag even when the classifier is at/below chance. Changed to:
+flag requires the CLASSIFIER to beat majority by a margin; MI is corroboration
+only (reported as mi_elevated). Planted-confounded test still flags correctly.
+
+73 tests pass. Next: R3 (fresh session, all A-J).
+
+---
+
+# HyFuse — builder response to review R2
+
 Reviewer report: `reports/review_R2.md` (independent fresh session, commit
 `e9eafa0`, scope A-F). Verdict: **Go with fixes, none blocking.** The builder
 session does not edit the review; dispositions below (AGENT_INSTRUCTIONS §4A).

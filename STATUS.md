@@ -1,4 +1,4 @@
-NEXT ACTION: Fix the two REAL findings the T3.4 calibration surfaced on main before R3: F5 (pass processing_level to confounder_report, say so if constant) and F7 (test asserting assay CV is grouped-by-hole + tolerance-matches-preregistered guard). Then R3 (fresh session, all A-J). T3.4 PASSED 3/3.
+NEXT ACTION: R3 — fresh independent session, scope ALL items A-J, at the current commit. Calibration PASSED so R3 is trusted. Fixed since T3.3: F5 (tir_processing_level confounder, honest 'not flagged'), F7 (grouped-CV + inter-hole-outlier + tolerance guards, 7 tests), confounder flag-logic false-positive bug. 73 tests pass.
 
 # HyFuse status
 

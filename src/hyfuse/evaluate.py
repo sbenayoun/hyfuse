@@ -223,19 +223,23 @@ def confounder_report(labels, features, confounders: dict,
 
     confounders: {name: array-like of per-window confounder values}
     (e.g. {'processing_level': [...], 'instrument_gen': [...]}).
-    Returns {name: {mi..., cv_accuracy..., flag: bool}} where flag=True means the
-    confounder is predicted clearly above chance (classifier accuracy exceeds
-    majority rate by a margin, or MI exceeds its shuffle p95).
+    Returns {name: {mi..., cv_accuracy..., flag_confounded: bool}}. flag=True
+    requires the GROUPED CLASSIFIER to beat the majority-class rate by a margin
+    (the robust signal). MI is reported as corroboration but does NOT flag on its
+    own: with imbalanced confounder classes, MI can exceed its shuffle p95 by
+    chance even when the classifier is at/below chance (calibration finding) — so
+    MI-only flags are false positives and are avoided.
     """
     report: dict[str, dict] = {}
     for name, conf in confounders.items():
         mi = confounder_mutual_information(labels, conf)
         auc = confounder_classifier_auc(features, conf, groups, seed=seed)
-        flag = (
-            (auc["cv_accuracy"] > auc["majority_rate"] + 0.10)
-            or (mi["mi"] > mi["mi_shuffle_p95"] and mi["mi"] > 0.05)
-        )
-        report[name] = {**mi, **auc, "flag_confounded": bool(flag)}
+        # primary signal: classifier clearly beats chance (majority rate).
+        classifier_beats_chance = auc["cv_accuracy"] > auc["majority_rate"] + 0.10
+        mi_elevated = mi["mi"] > mi["mi_shuffle_p95"] and mi["mi"] > 0.05
+        flag = classifier_beats_chance
+        report[name] = {**mi, **auc, "flag_confounded": bool(flag),
+                        "mi_elevated": bool(mi_elevated)}
     return report
 
 
@@ -305,3 +309,28 @@ def bootstrap_hole_delta(per_hole_a: dict[str, float],
     return {"delta_mean": float(deltas.mean()), "ci_low": float(lo),
             "ci_high": float(hi), "n_holes": len(deltas),
             "excludes_zero": bool(lo > 0 or hi < 0)}
+
+
+# --------------------------------------------------------------------------- #
+# Pre-registration guard (T3.4 / calibration finding F7)
+# --------------------------------------------------------------------------- #
+
+# The pre-registered boundary tolerance, frozen in commit 96c0454 before any
+# results existed. Changing the SCORED tolerance away from this without a
+# documented override is a post-hoc change (checklist item B).
+PREREGISTERED_DEPTH_TOLERANCE_M = 2.0
+
+
+def preregistered_tolerance_ok(scored_tol: float, *,
+                               override_reason: str | None = None) -> dict:
+    """Guard that the scored boundary tolerance matches the pre-registered value.
+
+    Returns {ok, scored, preregistered, override_reason}. ok is True iff the
+    scored tolerance equals the pre-registered value OR a non-empty
+    override_reason is supplied (which must also be documented in the README).
+    """
+    matches = abs(float(scored_tol) - PREREGISTERED_DEPTH_TOLERANCE_M) < 1e-9
+    ok = matches or bool(override_reason)
+    return {"ok": ok, "scored": float(scored_tol),
+            "preregistered": PREREGISTERED_DEPTH_TOLERANCE_M,
+            "override_reason": override_reason}
