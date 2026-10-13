@@ -1,4 +1,4 @@
-NEXT ACTION: Day 4 — T4.1 viewer ablation tab; T4.2 README (GSWA checklist + honest results table, n=15 one-deposit caveat, no-Au-skill, selection bias, AI tools, licence); T4.3 clean-clone reproduction + R4 (final, all A-J); T4.4 submission checklist; T4.5 pitch slides. R3 PASSED (Go with fixes, no scientific defects/blockers; F1/F2/F3 all documentary -> T4.2/T4.3).
+NEXT ACTION: T4.1 viewer ablation tab (add an ablation-summary view to the Streamlit app reading reports/ablation.md). Then T4.3 clean-clone reproduction + R4 (final, all A-J), T4.4 submission checklist, T4.5 pitch slides. T4.2 README DONE (clears R3 F1/F3; VERIFY team name/members/captain + screenshot). LICENSE (MIT) added.
 
 # HyFuse status
 
