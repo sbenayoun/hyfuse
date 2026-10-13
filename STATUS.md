@@ -1,4 +1,4 @@
-NEXT ACTION: R3 — fresh independent session, scope ALL items A-J, at the current commit. Calibration PASSED so R3 is trusted. Fixed since T3.3: F5 (tir_processing_level confounder, honest 'not flagged'), F7 (grouped-CV + inter-hole-outlier + tolerance guards, 7 tests), confounder flag-logic false-positive bug. 73 tests pass.
+NEXT ACTION: Day 4 — T4.1 viewer ablation tab; T4.2 README (GSWA checklist + honest results table, n=15 one-deposit caveat, no-Au-skill, selection bias, AI tools, licence); T4.3 clean-clone reproduction + R4 (final, all A-J); T4.4 submission checklist; T4.5 pitch slides. R3 PASSED (Go with fixes, no scientific defects/blockers; F1/F2/F3 all documentary -> T4.2/T4.3).
 
 # HyFuse status
 
@@ -163,6 +163,16 @@ Confounder: instrument_gen constant (all HL3+) -> degenerate=chance, not flagged
 confounders.md are small committable outputs.
 
 ## DAY 2 COMPLETE (T2.1-T2.8). R1+R2 passed.
+
+## R3 PASSED (fresh session, all A-J, commit 44cb119) — reports/review_R3.md
+- Verdict: Go with fixes. NO scientific defects, NO blockers. Headline reproduced
+  bit-for-bit; pre-reg/grouped-CV/permutation/confounders/assay-hygiene/no-data-
+  in-git all PASS with executed evidence. Only 'submission blocker' is the Day-1
+  README stub (documentary). Trusted because T3.4 calibration caught 3/3.
+- 3 findings, all documentary/planned: F1 README stub (T4.2), F2 clean-clone
+  fetch not demonstrated (T4.3), F3 single-deposit caveat (sharpened in
+  ablation.md now; README T4.2). No code changes required.
+- Dispositions in reports/review_response.md.
 
 ## Done (T3.4 reviewer calibration) — reports/calibration.md + calibration_review.md
 - Throwaway `calibration` branch: planted 3 flaws (window-level KFold leak;

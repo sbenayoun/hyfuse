@@ -1,4 +1,48 @@
-# HyFuse — builder response to review R2
+# HyFuse — builder response to review R3
+
+Reviewer: fresh independent session, scope ALL A-J, commit 44cb119
+(reports/review_R3.md). Verdict: **Go with fixes** — NO scientific defects, NO
+blockers; the headline (INCONCLUSIVE boundary recovery + no Au cross-hole skill)
+reproduced bit-for-bit, pre-registration/grouped-CV/permutation baseline/
+confounders/assay-hygiene/no-data-in-git all PASS. The only "submission blocker"
+is documentary (the Day-1 README stub). This is the first full A-J review on real
+results, and the T3.4 calibration (3/3 caught) says it can be trusted.
+
+## Dispositions (R3)
+
+### F1 [major] README still the Day-1 stub (claims/limitations not written)
+**ACCEPTED — scheduled T4.2 (Day 4), not a code defect.** The honest result,
+n=15 (one deposit + regional), the no-Au-skill result, and the assay selection
+bias must appear in the README itself, with links to reports/ablation.md and
+confounders.md. Tracked as the primary T4.2 content requirement.
+
+### F2 [minor] Clean-clone `make fetch && make evaluate` not demonstrated end-to-end
+**ACCEPTED — to demonstrate once at T4.3/R4 or document the fallback.** fetch is
+~8 GB; R3 (correctly) used cached data only. The `make evaluate` path already
+reproduces the committed reports bit-for-bit (R3 + calibration confirmed). T4.2
+README will state the fetch size and the cached-data fallback; T4.3 will attempt
+the full clean-clone path and record the log.
+
+### F3 [minor] Single-deposit dominance deserves a louder caveat
+**ACCEPTED — strengthen the caveat (reports + README).** Confirmed: 11/15 holes
+are Bannockburn (BBDD/BBRD), 4 are other projects (12DHDD0002, 15SYDD0003B,
+16CADD001, BCMH0070). Leave-holes-out across near-identical holes is a weak
+generality test. Will state "effectively one deposit + 4 regional holes" plainly
+in the README limitations and sharpen the ablation.md caveat now.
+
+## Questions carried to the geologist (item J)
+R3 produced a concrete interval packet (BCMH0070, BBDD0005, BBRD0056, 16CADD001)
+and the key open question: do detected boundaries coincide with the
+regolith/weathering transition (the main untested alternative explanation, C3)?
+These feed the results-based geologist round and the T4.2 limitations.
+
+## Net
+No code changes required by R3. One small reports caveat sharpened now; F1/F2/F3
+are T4.2/T4.3 (Day 4) README + reproduction tasks. 73 tests pass.
+
+---
+
+# HyFuse — builder response to review R2 (calibration follow-up + R2)
 
 ## Calibration (T3.4) follow-up fixes (findings F5, F7, + flag-logic bug)
 

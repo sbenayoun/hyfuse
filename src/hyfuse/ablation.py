@@ -273,7 +273,11 @@ def _write_reports(results: dict) -> None:
                "boundary agreement within tolerance, not code equality."),
               ("- Planted-truth study (reports/planted_truth.md): CLR under-performs "
                "-> Hellinger default; naive concat is a strong baseline."),
-              "- Results are over 15 gold holes (mostly one deposit); not general.",
+              ("- Results are over 15 gold holes, but 11/15 are ONE deposit "
+               "(Bannockburn BBDD/BBRD) + 4 regional holes (12DHDD0002, "
+               "15SYDD0003B, 16CADD001, BCMH0070). Leave-holes-out across "
+               "near-identical holes is a WEAK generality test — the result is "
+               "effectively conditioned on one geological setting. Not general."),
               ]
     (REPORTS / "ablation.md").write_text("\n".join(lines) + "\n")
 
