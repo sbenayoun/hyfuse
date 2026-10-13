@@ -15,9 +15,9 @@
 
 ## Team
 
-- **Team name:** `VERIFY: <team name>`
-- **Members:** `VERIFY: <members>`
-- **Team captain:** `VERIFY: <captain>`
+- **Team name:** A_Team_Name 
+- **Members:** Stephane Benayoun
+- **Team captain:** Stephane Benayoun
 
 ## What we built
 
