@@ -15,7 +15,7 @@
 
 ## Team
 
-- **Team name:** A_Team_Name 
+- **Team name:** HyFuse Team
 - **Members:** Stephane Benayoun
 - **Team captain:** Stephane Benayoun
 
@@ -88,7 +88,7 @@ package). Python 3.12.
 ```bash
 uv sync
 make doctor            # environment smoke test
-make test              # 73 tests (planted-truth + corruption tests included)
+make test              # 75 tests (planted-truth + corruption tests included)
 
 make fetch             # downloads TSG packages for config/holes.yaml (~8 GB; NOT in git)
 make features          # tidy per-hole Parquet + coverage audit

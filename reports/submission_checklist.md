@@ -5,9 +5,8 @@ commit before submitting.
 
 ## GSWA required items (hackathon repo README checklist)
 
-- [x] **Team name / members / captain** — in README (team: A_Team_Name;
-      member/captain: Stephane Benayoun). `VERIFY:` replace team name if a real
-      one is agreed.
+- [x] **Team name / members / captain** — in README (team: HyFuse Team;
+      member/captain: Stephane Benayoun).
 - [x] **Challenge theme** — Data Crunch (README header).
 - [x] **Problem tackled + what was built** — README "What we built".
 - [x] **Which HyLogger data + where to get it** — README "Data": NCI THREDDS +
@@ -32,8 +31,8 @@ commit before submitting.
 - [x] README results match script output — key numbers (0.140, 0.139, +0.001,
       CI) match reports/ablation.md.
 - [x] Reviews R1–R4 in separate fresh sessions; every finding dispositioned in
-      reports/review_response.md. R1/R2/R3 done + resolved; **R4 in progress**
-      (fresh session) — confirm no open FAIL before submitting.
+      reports/review_response.md. R1/R2/R3 resolved; **R4 = GO FOR SUBMISSION**
+      (two trivial doc nits fixed; no open FAIL).
 - [x] Reviewer calibration (reports/calibration.md): planted 3 flaws, reviewer
       caught **3/3** -> review process trusted.
 - [x] README lists the failure modes checked and the accepted limitations
@@ -53,5 +52,5 @@ commit before submitting.
 ## Open items before final submit
 1. Add a viewer screenshot (T4.5 / README).
 2. Confirm R4 returns clean (no open FAIL).
-3. Replace team name if a real one is chosen.
+3. (done) Team name set to "HyFuse Team".
 4. Build + attach the pitch PDF (T4.5), then submit the repo link.

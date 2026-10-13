@@ -1,4 +1,4 @@
-NEXT ACTION: R4 — FINAL review (fresh session, all A-J, incl. clean-clone reproduction which is now demonstrated in reports/reproduction.md). Then T4.4 submission checklist, T4.5 pitch slides, submit via GSWA form. T4.3 PASSED: fresh clone of public repo reproduces reports BIT-FOR-BIT; 75 tests pass; DOCTOR OK. Repo pushed c449c87.
+NEXT ACTION: SUBMISSION (human steps) — R4 PASSED "GO FOR SUBMISSION" (no scientific defects/blockers; 2 trivial doc nits fixed). Remaining non-repo: (1) viewer screenshot, (2) build pitch PDF from reports/pitch.md (<=25 MB), (3) confirm/replace team name, (4) captain submits repo link https://github.com/sbenayoun/hyfuse via GSWA form before Thu 15 Oct 23:59 AWST. Repo: all 4 days done, R1-R4 + calibration passed, clean-clone reproducible, 75 tests pass.
 
 # HyFuse status
 

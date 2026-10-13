@@ -1,3 +1,38 @@
+# HyFuse — builder response to review R4 (FINAL)
+
+Reviewer: fresh independent session, scope ALL A-J + clean-clone reproduction,
+commit 19785e8 (reports/review_R4.md). **Verdict: GO FOR SUBMISSION.** No
+scientific defects, no blockers. Every control verified with executed evidence;
+headline reproduced bit-for-bit; all three R3 findings confirmed resolved;
+calibration branch confirmed never merged into main.
+
+## Dispositions (R4)
+
+### F1 [minor] README said "73 tests"; suite is now 75
+**FIXED (commit <this>).** README install block updated to "75 tests".
+
+### F2 [minor] params.yaml comments still described CLR as the method
+**FIXED (commit <this>).** Added a note that the LIVE DEFAULT transform is
+Hellinger and CLR is retained as an ablation only. COMMENT-ONLY change —
+verified the actual YAML content is byte-identical after stripping comments
+(no numeric/key change), so pre-registration integrity (item B) is preserved;
+reports still reproduce bit-for-bit after the edit.
+
+## Confirmed resolved (R3 -> R4)
+- F1 (README): now the full honest version — results table, limitations,
+  verification, GSWA checklist. PASS.
+- F2 (clean-clone reproduction): demonstrated + independently re-verified
+  bit-for-bit (reports/reproduction.md). PASS.
+- F3 (single-deposit caveat): "11/15 one deposit + 4 regional; weak generality"
+  stated in README and ablation.md. PASS.
+
+## Net
+Two trivial doc fixes applied; no code/results/numeric-param changes. Repo is
+submission-ready. Open NON-repo items (human): viewer screenshot, build pitch
+PDF, confirm team name, captain submits repo link via the GSWA form.
+
+---
+
 # HyFuse — builder response to review R3
 
 Reviewer: fresh independent session, scope ALL A-J, commit 44cb119

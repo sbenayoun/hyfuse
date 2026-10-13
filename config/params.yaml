@@ -7,13 +7,20 @@
 seed: 42
 
 # --- Compositional features (T2.3) ---
-# CLR (centered log-ratio) is applied PER VIEW separately; SWIR and TIR
-# abundances are NEVER pooled into one composition.
-# Zero handling: a zero mineral-group abundance means "not detectable in this
-# view", NOT a trace amount. CLR needs strictly positive parts, so we use a
-# multiplicative zero replacement: replace zeros with delta, renormalise the
-# non-zero parts down to preserve the simplex. delta is recorded here and is
-# ABLATABLE. (ASSUMPTION: delta small relative to smallest positive abundance.)
+# LIVE DEFAULT TRANSFORM = HELLINGER (sqrt). The planted-truth study (T3.1,
+# reports/planted_truth.md) found CLR's geometric-mean centring destroyed the
+# domain signal when many mineral groups are near-zero; Hellinger recovers it and
+# handles zeros natively. CLR is RETAINED as an ablation only (features.
+# view_features(transform="clr")). The `clr:` block below configures that
+# ablation path; it is NOT the shipped method. (Numeric params unchanged since
+# pre-registration; only this comment clarifies the default — R4 finding F2.)
+#
+# CLR (centered log-ratio), when used, is applied PER VIEW separately; SWIR and
+# TIR abundances are NEVER pooled into one composition (true for Hellinger too).
+# Zero handling (CLR path): a zero mineral-group abundance means "not detectable
+# in this view", NOT a trace amount. CLR needs strictly positive parts, so a
+# multiplicative zero replacement replaces zeros with delta and renormalises.
+# delta is recorded here and is ABLATABLE.
 clr:
   zero_strategy: multiplicative_replacement
   delta: 1.0e-6
