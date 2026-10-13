@@ -124,6 +124,27 @@ serves HTTP 200 on WSL (open in Windows browser). Tests (tests/test_viewer.py,
 ## CUT LINE (end of Day 2): T2.4 (domaining) and T2.5 (boundary agreement) WORK
 (tested) -> stay on course for the fusion ablation (Rung 2). No cut.
 
+## T3.1 planted-truth + T3.2 arms (synth.py, fusion.py) — see reports/planted_truth.md
+
+Simulator: known mineral mixes + domain boundaries -> view-specific detectability
+(TIR all minerals, SWIR only hydroxyl/carbonate/sulfate, chlorite in both). The
+97% quartz / 3% chlorite case reproduces: SWIR chlorite-dominant, TIR silica.
+
+KEY METHOD CHANGE (evidence-driven): **CLR -> Hellinger (sqrt) as default
+transform.** CLR's geometric-mean centring destroyed domain signal when many
+groups are near-zero (within-view ARI 0.94 raw -> 0.06 CLR); Hellinger recovers
+it (0.94), handles zeros natively, no delta. CLR kept as an ablation option.
+features.view_features(transform=hellinger|clr); fusion arms use it.
+
+Four arms (fusion.py): swir_only, tir_only, concat(raw), fused(per-view transform
+then concat), all aligned to identical windows (item C2).
+
+HONEST planted-truth finding: on the simulated (TIR-separable) domains, TIR alone
+== raw_concat (~0.79 ARI), and symmetric fused dilutes the strong view (0.58).
+Test asserts only ROBUST claims: 97/3 effect, method works (best arm > 0.5),
+multi-view >= weakest single, four arms run. Does NOT assert fusion > best single
+(not robust) -> that is decided by the REAL ablation (T3.3). 62 tests pass.
+
 ## T2.7 corruption tests (tests/test_corruption.py) + guards (qc.py)
 
 The pipeline must FLAG or visibly DEGRADE on each injected fault; a silent pass

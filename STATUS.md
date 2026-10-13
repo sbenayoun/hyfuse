@@ -1,4 +1,4 @@
-NEXT ACTION: Day 3 T3.1 (planted-truth synth.py). R2 PASSED at e9eafa0 (Go with fixes): F1 (scaler-in-CV-pipeline) FIXED, F2 (instrument_gen inferred HL2+/HL3+/HL4) FIXED. See reports/review_R2.md + review_response.md. 57 tests pass. CUT LINE passed (fusion stays).
+NEXT ACTION: T3.3 — real-hole evaluation run. Build per-hole composited windows (15 fetched holes) -> four arms (Hellinger default) -> boundary agreement vs logged lithology (permutation baseline), assay (Au_PPM) prediction with GroupKFold-by-hole, confounder check per arm, hole-level bootstrap CIs. Write reports/ablation.md + confounders.md with a plain-language reading. Then calibration run (T3.4) + R3.
 
 # HyFuse status
 
@@ -139,7 +139,19 @@ NEXT ACTION: Day 3 T3.1 (planted-truth synth.py). R2 PASSED at e9eafa0 (Go with 
 - Boots HTTP 200 on WSL headless. 3 tests. 56 tests pass.
 
 ## CUT LINE PASSED: T2.4/T2.5 work -> fusion ablation stays in (Rung 2).
-## DAY 2 COMPLETE (T2.1-T2.8). Next: R2 (fresh session, A-F) then Day 3 T3.1.
+## DAY 2 COMPLETE (T2.1-T2.8). R1+R2 passed.
+
+## Done (T3.1 planted-truth + T3.2 arms) — see reports/planted_truth.md
+- synth.py: known-truth sim, view-specific detectability; 97/3 qtz/chl case OK.
+- fusion.py: 4 arms (swir/tir/concat/fused), aligned to identical windows (C2).
+- METHOD CHANGE: CLR -> Hellinger default. CLR geometric-mean centring destroyed
+  domain signal (within-view ARI 0.94 raw -> 0.06 CLR); Hellinger recovers 0.94,
+  handles zeros natively. CLR kept as an ablation (features.view_features).
+- HONEST finding: simulated domains are TIR-separable; TIR==raw_concat (~0.79),
+  symmetric fused dilutes the strong view (0.58). Test asserts only robust claims
+  (97/3 effect, method works best>0.5, multi-view>=weakest single, 4 arms run).
+  "fusion > best single" NOT asserted -> decided by the REAL ablation (T3.3).
+- 62 tests pass. All 15 shortlist holes FETCHED (+ETG0187), git-ignored.
 
 ## Pre-fetched assets (in ../, outside the repo)
 - ../datasets/INTERIM_HyLogger_Dataset_Package_GDA2020_DB.zip (DASC package,

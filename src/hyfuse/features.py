@@ -108,6 +108,48 @@ def clr(mat: pd.DataFrame) -> pd.DataFrame:
                         columns=[f"{c}_clr" for c in mat.columns])
 
 
+def hellinger(mat: pd.DataFrame) -> pd.DataFrame:
+    """Hellinger (square-root) transform of a composition matrix.
+
+    Closes each row to sum 1, then takes the element-wise square root. This is a
+    standard compositional transform that:
+      - handles structural zeros natively (no zero-replacement / delta needed),
+      - is bounded and stable, and
+      - (on the planted-truth test) PRESERVES domain-discriminative signal that
+        CLR's geometric-mean centring destroys when many parts are near-zero.
+    Columns suffixed '_hel'. Rows summing to 0 (aspectral) map to all-zero.
+    """
+    arr = mat.to_numpy(dtype=float)
+    sums = arr.sum(axis=1, keepdims=True)
+    comp = np.divide(arr, sums, out=np.zeros_like(arr), where=sums > 0)
+    return pd.DataFrame(np.sqrt(comp), index=mat.index,
+                        columns=[f"{c}_hel" for c in mat.columns])
+
+
+def view_features(mat: pd.DataFrame, view: str, *, transform: str = "hellinger",
+                  delta: float = 1e-6) -> pd.DataFrame:
+    """Per-view compositional features (view-prefixed), transform-selectable.
+
+    transform:
+      - "hellinger" (default): sqrt of the closed composition. Robust to zeros;
+        the project default after the planted-truth study (see reports).
+      - "clr": centered log-ratio with multiplicative zero replacement (delta).
+        Kept as an ablation; underperforms on planted truth.
+    Drops all-zero (aspectral) windows. Columns prefixed with the view.
+    """
+    nz = mat[mat.sum(axis=1) > 0]
+    if nz.empty:
+        return nz
+    if transform == "clr":
+        out = clr(multiplicative_replacement(nz, delta))
+    elif transform == "hellinger":
+        out = hellinger(nz)
+    else:
+        raise ValueError(f"unknown transform: {transform}")
+    out.columns = [f"{view}_{c}" for c in out.columns]
+    return out
+
+
 def clr_features(composited: pd.DataFrame, view: str,
                  delta: float = 1e-6,
                  min_nonzero_groups: int = 1) -> pd.DataFrame:
