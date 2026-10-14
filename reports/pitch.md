@@ -56,7 +56,8 @@ Built to give a trustworthy answer — positive or not.
 
 ## 4. The result (stated plainly)
 
-15 gold holes → INCONCLUSIVE. Fusion is no better than the best single view.
+15 gold holes → INCONCLUSIVE at our pre-registered 5 m window. Fusion is no
+better than the best single view.
 
 | arm | boundary F1 | gold Au R² (held-out) |
 |---|---:|---:|
@@ -69,6 +70,25 @@ Built to give a trustworthy answer — positive or not.
 - No arm predicts gold on held-out holes (all median R² ≤ 0).
 
 A negative result, reported as plainly as a positive one would be.
+
+---
+
+## 4b. Sensitivity — and why we didn't move the goalposts
+
+A geologist suggested finer windows. We ran it as a declared sensitivity
+analysis (the 5 m headline stays frozen — pre-registered before any results):
+
+| window | fused − best single | 95% CI | verdict |
+|---|---:|---|---|
+| 5 m (headline) | +0.001 | [−0.017, +0.022] | inconclusive |
+| 1 m | +0.028 | [+0.008, +0.051] | fusion helps |
+| 0.5 m | −0.016 | [−0.044, +0.015] | inconclusive |
+
+At ~1 m fusion *does* beat the single view — but it flips back at 0.5 m. So the
+honest statement is: **the fusion benefit is not robust across resolutions.** We
+report the favourable 1 m slice as a sensitivity, not as the headline. Whether
+the 1 m gain is real lithology or finer windows matching dense logging is an open
+question for a geologist.
 
 ---
 

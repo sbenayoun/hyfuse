@@ -76,24 +76,44 @@ itself was calibrated." This is the trust story; say it with confidence.
 
 ---
 
-## Slide 4 — The result  [~60s] — THE MONEY SLIDE
+## Slide 4 — The result  [~55s] — THE MONEY SLIDE
 
 Goal: deliver the honest answer plainly. Do not dress it up.
 
 Say:
-- "Here's the result on 15 gold holes. And it's **inconclusive** — in a specific,
-  honest way."
+- "Here's the result on 15 gold holes, at our pre-registered 5-metre window. And
+  it's **inconclusive** — in a specific, honest way."
 - "Fusion scores 0.140 on boundary recovery; the best single view, TIR, scores
   0.139. The difference is **plus 0.001**, and the confidence interval crosses
   zero. So: **fusion is no better than just using TIR.**"
-- "And separately — **no** version predicts gold grade on held-out holes. The
-  mineralogy windows alone don't carry it."
-- "That's a negative result. I'm presenting it exactly as plainly as I'd present a
-  positive one — because the point of all that rigor was to be able to *trust*
-  whatever answer came out."
+- "And separately — **no** version predicts gold grade on held-out holes."
+- "That's a negative result. I'm presenting it exactly as plainly as I'd present
+  a positive one — the point of all that rigor was to *trust* whatever came out."
 
 Land: "+0.001, CI crosses zero → no better than one view" and "no gold skill."
-Pause after. Let it sit.
+Pause. (Then go to 4b.)
+
+---
+
+## Slide 4b — Sensitivity (why we didn't move the goalposts)  [~40s]
+
+Goal: turn "did you try other settings?" into a demonstration of integrity.
+
+Say:
+- "A geologist reviewing our work asked: why 5 metres — would finer windows help?
+  Good question. So I ran it — as a *declared sensitivity analysis*, with the
+  5-metre headline left frozen."
+- "At 1 metre, fusion actually *does* beat the single view — the interval excludes
+  zero. But at half a metre it flips back to inconclusive."
+- "So the honest statement is: **any fusion benefit is not robust — it only shows
+  up near 1 metre.** I'm reporting the favourable slice as a sensitivity, not
+  promoting it to the headline. Moving the goalposts after seeing the result is
+  exactly the kind of thing my planted-flaw test was built to catch."
+- "Whether that 1-metre signal is real geology or just finer windows matching
+  dense logging — that's the open question I've handed back to the geologist."
+
+Land: "fusion helps at 1 m, but not robust — and we did NOT move the headline."
+This is your integrity story made concrete; deliver it with a bit of pride.
 
 ---
 
@@ -135,6 +155,12 @@ steps." Close: "Everything's in the repo — thank you."
 
 ## If asked (Q&A backup — appendix slides)
 
+- **"Did you try finer / different windows?"** "Yes — a geologist asked, so I ran
+  a sensitivity sweep. At 1 metre fusion edges ahead; at half a metre it's
+  inconclusive again. It's not robust, so I kept the pre-registered 5-metre result
+  as the headline and reported the rest as a sensitivity. Native data spacing is
+  ~8 mm, so even finer is possible — that's a next step, with a geologist deciding
+  whether the 1-metre signal is real."
 - **"Why didn't fusion win?"** "On my known-answer simulation, these domains were
   already very separable in TIR, so there was little for the second view to add.
   Whether fusion helps probably depends on finding holes where the two views
