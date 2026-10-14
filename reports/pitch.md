@@ -5,8 +5,9 @@ Team: HyFuse Team · https://github.com/sbenayoun/hyfuse
 
 > Plain outline for building the pitch deck (PowerPoint / Google Slides / Canva).
 > Every number is from `reports/` — do not add any figure the pipeline did not
-> generate. Add the viewer screenshot (`docs/viewer.png`) on the "What we built"
-> slide. The slide PDF is a submission-form attachment and is not committed.
+> generate. Images (committed under `docs/`): the SWIR|TIR side-by-side figures
+> (`docs/16CADD001_swir_tir.html`, `BCMH0070_swir_tir.html`) on slide 1, and the
+> viewer screenshot (`docs/viewer.png`) on slide 2. The slide PDF is a submission-form attachment and is not committed.
 
 ---
 
@@ -17,6 +18,10 @@ Combining SWIR and TIR HyLogger results is an unsolved problem (GSWA).
 - The two sensors see different minerals: a rock that is 97% quartz / 3% chlorite
   reads quartz-dominant in TIR but chlorite-only in SWIR.
 - GSWA: a good way to combine them "would be a powerful tool".
+
+(Show the SWIR|TIR side-by-side figure: `docs/16CADD001_swir_tir.html` — same
+hole, two views. SILICA / feldspars / pyroxenes appear only in TIR; both views
+share the hydroxyl minerals and chlorite. That gap is the problem.)
 
 **Our question:** does fusing SWIR + TIR recover geological domains and
 gold-related properties better than either view alone — on drillholes the method

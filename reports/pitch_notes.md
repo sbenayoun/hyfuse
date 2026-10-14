@@ -23,11 +23,16 @@ Say:
 - "Here's why it's hard, in one example: a rock that's 97% quartz and 3% chlorite
   reads as **quartz** in the TIR view and as **chlorite** in the SWIR view. Same
   rock, two different stories, because each sensor only sees some minerals."
+- (point at the SWIR|TIR side-by-side figure) "This is one real hole, both views.
+  Look — silica, feldspars, pyroxenes show up on the TIR side and are simply
+  **absent** on the SWIR side. The two instruments literally see different rock.
+  That gap is the whole problem."
 - "So the question I set out to answer: **does combining the two views actually
   recover geology better than using one view — tested on drillholes the method
   has never seen?**"
 
-Land: "unsolved problem", the 97/3 example, "held-out holes".
+Land: "unsolved problem", the 97/3 example, the visible SWIR/TIR gap,
+"held-out holes".
 
 ---
 
