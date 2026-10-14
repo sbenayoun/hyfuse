@@ -167,6 +167,9 @@ plus an **Ablation summary** tab showing the generated results:
 ## Reproducing the figures
 
 `make fetch && make evaluate` on a clean clone reproduces `reports/ablation.md`
-and `reports/confounders.md`. Runtime: features+evaluate on cached data is a few
-minutes; `make fetch` dominates (~8 GB download). Disk: budget ~15 GB for the
+and `reports/confounders.md`. Runtime: `make evaluate` now also runs the
+window-size sensitivity sweep (5 m headline + 1 m + 0.5 m), so budget ~10-20
+minutes on cached data (longer on slower machines); `make features` alone is a
+few minutes. `make fetch` dominates overall (~8 GB download). Disk: budget ~15 GB
+for the
 cached zips + extracted TSG.

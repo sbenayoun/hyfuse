@@ -1,4 +1,4 @@
-NEXT ACTION: SUBMISSION (human) before Thu 15 Oct 23:59 AWST (~30h). Repo complete + pushed. Build pitch PDF from reports/pitch.md(+notes), submit repo link + PDF via GSWA form. Geologist round done: reply (reports/geologist_reply.md) + review packet + 8 HTML figures. Added WINDOW-SIZE SENSITIVITY (reports/sensitivity.md): headline stays pre-registered 5 m (inconclusive); at 1 m fusion beats TIR (CI excl 0); at 0.5 m inconclusive -> "fusion benefit NOT robust across resolutions", reported honestly (no post-hoc headline change). 76 tests pass (+1 slow, gated).
+NEXT ACTION: SUBMISSION (human) before Thu 15 Oct 23:59 AWST. R5 (full A-J, post-geologist-feedback) = GO FOR SUBMISSION, both findings positive (N1 pre-reg held, N2 sensitivity reproduces + baseline controls); only a minor README runtime note fixed. Repo complete + pushed, fully re-verified at final commit. Build pitch PDF from reports/pitch.md(+notes); submit repo link + PDF via GSWA form. Geologist round done (reply + packet + figures + sensitivity.md).
 
 # HyFuse status
 

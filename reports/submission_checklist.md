@@ -31,7 +31,7 @@ commit before submitting.
 - [x] README results match script output — key numbers (0.140, 0.139, +0.001,
       CI) match reports/ablation.md.
 - [x] Reviews R1–R4 in separate fresh sessions; every finding dispositioned in
-      reports/review_response.md. R1/R2/R3 resolved; **R4 = GO FOR SUBMISSION**
+      reports/review_response.md. R1-R4 resolved; **R5 (post-geologist-feedback) = GO FOR SUBMISSION**
       (two trivial doc nits fixed; no open FAIL).
 - [x] Reviewer calibration (reports/calibration.md): planted 3 flaws, reviewer
       caught **3/3** -> review process trusted.

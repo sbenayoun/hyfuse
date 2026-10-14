@@ -1,3 +1,46 @@
+# HyFuse — builder response to review R5 (FINAL, post-geologist-feedback)
+
+Reviewer: fresh independent session, scope ALL A-J (focus on the new window-size
+sensitivity), commit 63181da (reports/review_R5.md). **Verdict: GO FOR
+SUBMISSION. No blockers, no open majors.** Both findings are POSITIVE:
+
+- **N1 (positive):** pre-registration held — `git diff 96c0454 63181da` shows the
+  only non-comment change since the freeze is the ADDED `window_sensitivity_m`
+  key; headline 5 m window and all frozen values byte-identical at freeze and
+  HEAD. The sweep is a declared addition, not a post-hoc headline change.
+- **N2 (positive):** sensitivity results reproduce exactly, reuse the identical
+  scoring path (only win_override changes), and the permutation baseline still
+  controls at 1 m (only 27% of holes beat chance) — the favourable 1 m result is
+  genuine and declared non-robust, not a weakened-baseline artifact.
+
+All A-J re-confirmed PASS (incl. R4-resolved items). J1/J2 UNVERIFIED (geological
+plausibility — deferred to the geologist, already flagged OPEN). Clean-clone cold
+`make fetch` not re-run (cached-only instruction; demonstrated at R4).
+
+## Dispositions (R5)
+
+### M1 [minor] `make evaluate` now also runs the 1 m / 0.5 m sensitivity sweep
+**FIXED (commit <this>).** README runtime note updated: `make evaluate` budget
+~10-20 min on cached data (it now runs the headline + sensitivity sweep), not
+"a few minutes". No code change needed; the sweep is intended behaviour and the
+slow unit test is gated behind HYFUSE_SLOW_TESTS=1 so `make test` stays fast.
+
+### N1, N2 — positive findings, no action
+Recorded as confirmation that the integrity-sensitive change was handled
+correctly.
+
+## Open (handed to the geologist, not blockers)
+- Is the ~1 m fusion gain real lithology or finer windows matching dense logging
+  by chance? (sensitivity.md OPEN; geologist packet question 1)
+- Do detected boundaries track weathering/regolith vs lithology? (J1/J2)
+- Confirm below-detection convention + Au outliers.
+
+## Net
+One minor README runtime fix; no code/results/numeric-param change. Repo is
+submission-ready and fully re-verified at the final commit.
+
+---
+
 # HyFuse — builder response to review R4 (FINAL)
 
 Reviewer: fresh independent session, scope ALL A-J + clean-clone reproduction,
