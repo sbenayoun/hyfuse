@@ -1,4 +1,4 @@
-NEXT ACTION: SUBMISSION (human steps) — R4 PASSED "GO FOR SUBMISSION" (no scientific defects/blockers; 2 trivial doc nits fixed). Remaining non-repo: (1) viewer screenshot, (2) build pitch PDF from reports/pitch.md (<=25 MB), (3) confirm/replace team name, (4) captain submits repo link https://github.com/sbenayoun/hyfuse via GSWA form before Thu 15 Oct 23:59 AWST. Repo: all 4 days done, R1-R4 + calibration passed, clean-clone reproducible, 75 tests pass.
+NEXT ACTION: SUBMISSION (human) before Thu 15 Oct 23:59 AWST (~30h). Repo complete + pushed. Build pitch PDF from reports/pitch.md(+notes), submit repo link + PDF via GSWA form. Geologist round done: reply (reports/geologist_reply.md) + review packet + 8 HTML figures. Added WINDOW-SIZE SENSITIVITY (reports/sensitivity.md): headline stays pre-registered 5 m (inconclusive); at 1 m fusion beats TIR (CI excl 0); at 0.5 m inconclusive -> "fusion benefit NOT robust across resolutions", reported honestly (no post-hoc headline change). 76 tests pass (+1 slow, gated).
 
 # HyFuse status
 

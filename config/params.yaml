@@ -31,6 +31,13 @@ clr:
 window_size_m: 5.0        # GSWA gold example uses 5 m averaged cut-offs
 min_interval_m: 1.0       # minimum domain interval length (ruptures)
 
+# --- Window-size sensitivity analysis (added 2026-10-14 after geologist feedback) ---
+# The HEADLINE window stays 5.0 m (pre-registered, frozen before results). This
+# sweep is a declared SENSITIVITY analysis only: report the fused-vs-best-single
+# result at several resolutions side by side, honestly. It does NOT change the
+# headline. Native HyLogger spacing is ~8 mm so these are all achievable.
+window_sensitivity_m: [5.0, 1.0, 0.5]
+
 # --- Boundary agreement metric (T2.5) — PRE-REGISTERED, frozen before results ---
 # Committed BEFORE any scoring/results file exists (verifiable via
 # `git log -p config/params.yaml`). Do not change after seeing results without a

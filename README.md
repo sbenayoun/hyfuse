@@ -58,6 +58,12 @@ is hand-entered.
   mineralogy windows alone do not predict Au grade on held-out holes.
 - **Confounder:** detected domains are **not** explained by TIR processing level
   (`reports/confounders.md`).
+- **Window-size sensitivity** (`reports/sensitivity.md`): the headline uses the
+  pre-registered **5 m** window. The verdict is *sensitive to resolution* — at
+  **~1 m fusion does beat** the best single view (delta +0.028, CI [+0.008,
+  +0.051]), but at 0.5 m it is inconclusive again. We report this honestly and do
+  **not** move the headline off 5 m post-hoc: **any fusion benefit is not robust
+  across resolutions.**
 
 See `reports/planted_truth.md` for the known-answer study that drove our method
 choices (notably: CLR destroyed the domain signal, so we use a Hellinger

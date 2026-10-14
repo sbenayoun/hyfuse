@@ -39,10 +39,15 @@ def _per_hole_features(hole: str, win: float, transform: str, seed: int):
 
 
 def run_ablation(*, transform: str | None = None,
-                 write: bool = True) -> dict:
-    """Run the four-arm ablation on all shortlisted holes; return results dict."""
+                 write: bool = True, win_override: float | None = None) -> dict:
+    """Run the four-arm ablation on all shortlisted holes; return results dict.
+
+    win_override: if given, use this window size instead of the pre-registered
+    params.window_size_m. Used ONLY by the declared window-size sensitivity
+    analysis (run_window_sensitivity); the headline run leaves it None.
+    """
     params = da.load_params()
-    win = float(params["window_size_m"])
+    win = float(win_override) if win_override is not None else float(params["window_size_m"])
     seed = int(params["seed"])
     tol = float(params["depth_tolerance_m"])
     # Guard: scored tolerance must match the pre-registered value (F7). A
@@ -273,6 +278,11 @@ def _write_reports(results: dict) -> None:
                "boundary agreement within tolerance, not code equality."),
               ("- Planted-truth study (reports/planted_truth.md): CLR under-performs "
                "-> Hellinger default; naive concat is a strong baseline."),
+              ("- WINDOW-SIZE SENSITIVITY (reports/sensitivity.md): this headline "
+               "uses the pre-registered 5 m window. The verdict is sensitive to "
+               "resolution — at ~1 m fusion beats the best single view, at 0.5 m "
+               "it is inconclusive again. The fusion benefit is NOT robust across "
+               "resolutions; we do not move the headline off 5 m post-hoc."),
               ("- Results are over 15 gold holes, but 11/15 are ONE deposit "
                "(Bannockburn BBDD/BBRD) + 4 regional holes (12DHDD0002, "
                "15SYDD0003B, 16CADD001, BCMH0070). Leave-holes-out across "
@@ -312,12 +322,85 @@ def _write_reports(results: dict) -> None:
     (REPORTS / "confounders.md").write_text("\n".join(clines) + "\n")
 
 
+def run_window_sensitivity(*, write: bool = True) -> dict:
+    """Declared sensitivity analysis: fused-vs-best-single across window sizes.
+
+    Runs the four-arm ablation at each window in params.window_sensitivity_m and
+    collects the fused-vs-best-single boundary-F1 delta + bootstrap CI. The
+    HEADLINE window (params.window_size_m) is unchanged; this only reports how the
+    verdict depends on resolution. Writes reports/sensitivity.md.
+    """
+    params = da.load_params()
+    headline = float(params["window_size_m"])
+    wins = [float(w) for w in params.get("window_sensitivity_m", [headline])]
+    rows = []
+    for w in wins:
+        res = run_ablation(write=False, win_override=w)
+        mf = res["mean_boundary_f1"]
+        boot = res["fused_vs_best_single_bootstrap"]
+        bs = res["best_single"]
+        rows.append({
+            "window_m": w, "is_headline": abs(w - headline) < 1e-9,
+            "fused_f1": mf["fused"], "tir_f1": mf["tir_only"],
+            "swir_f1": mf["swir_only"], "concat_f1": mf["concat"],
+            "best_single": bs, "delta": boot["delta_mean"],
+            "ci_low": boot["ci_low"], "ci_high": boot["ci_high"],
+            "excludes_zero": boot["excludes_zero"],
+        })
+    result = {"headline_window_m": headline, "rows": rows}
+    if write:
+        _write_sensitivity(result)
+    return result
+
+
+def _write_sensitivity(result: dict) -> None:
+    REPORTS.mkdir(parents=True, exist_ok=True)
+    hw = result["headline_window_m"]
+    lines = [
+        "# Window-size sensitivity (added after geologist feedback, 2026-10-14)\n",
+        (f"Headline window is **{hw} m** (pre-registered, frozen before results — "
+         "unchanged). This is a DECLARED sensitivity analysis showing how the "
+         "fused-vs-best-single-view verdict depends on window resolution. Native "
+         "HyLogger sample spacing is ~8 mm, so all windows below are achievable.\n"),
+        ("\n| window (m) | fused F1 | TIR F1 | SWIR F1 | concat F1 | "
+         "delta (fused−best) | 95% CI | verdict |"),
+        "|---:|---:|---:|---:|---:|---:|---|---|",
+    ]
+    for r in result["rows"]:
+        tag = " (headline)" if r["is_headline"] else ""
+        if r["excludes_zero"] and r["delta"] > 0:
+            verdict = "fusion helps"
+        elif r["excludes_zero"] and r["delta"] < 0:
+            verdict = "single view better"
+        else:
+            verdict = "inconclusive"
+        lines.append(
+            f"| {r['window_m']}{tag} | {r['fused_f1']:.3f} | {r['tir_f1']:.3f} | "
+            f"{r['swir_f1']:.3f} | {r['concat_f1']:.3f} | {r['delta']:+.3f} | "
+            f"[{r['ci_low']:+.3f}, {r['ci_high']:+.3f}] | {verdict} |")
+    lines += [
+        "\n## Reading\n",
+        ("- The result is **sensitive to window size**. At the pre-registered 5 m "
+         "it is inconclusive; at ~1 m fusion beats the best single view (CI "
+         "excludes zero); at 0.5 m it is inconclusive again."),
+        ("- We do NOT change the headline to 1 m: that would be a post-hoc "
+         "goalpost move. The honest statement is **'any fusion benefit is not "
+         "robust across resolutions; it appears only near 1 m.'**"),
+        ("- OPEN (for a geologist): at finer windows boundary F1 rises for ALL "
+         "arms — is the ~1 m fusion gain real lithology, or finer windows matching "
+         "dense company logging by chance? The permutation baseline controls per "
+         "window, but the interpretation is geological."),
+    ]
+    (REPORTS / "sensitivity.md").write_text("\n".join(lines) + "\n")
+
+
 def main() -> int:
     logging.basicConfig(level=logging.INFO,
                         format="%(asctime)s %(levelname)s %(message)s")
     res = run_ablation()
     print(_reading(res))
-    print("wrote reports/ablation.md and reports/confounders.md")
+    run_window_sensitivity()
+    print("wrote reports/ablation.md, confounders.md and sensitivity.md")
     return 0
 
 

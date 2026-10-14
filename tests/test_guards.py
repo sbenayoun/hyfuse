@@ -86,3 +86,22 @@ def test_tolerance_guard_allows_documented_override():
     g = ev.preregistered_tolerance_ok(4.0, override_reason="sensitivity analysis in README")
     assert g["ok"] is True
     assert g["override_reason"]
+
+
+def test_window_sensitivity_runs_and_includes_headline():
+    """Sensitivity sweep returns a row per window incl. the pre-registered one.
+
+    Slow (re-runs the full ablation per window on real data) -> opt-in via
+    HYFUSE_SLOW_TESTS=1 so the default `make test` stays fast.
+    """
+    import os
+    if os.environ.get("HYFUSE_SLOW_TESTS") != "1":
+        import pytest
+        pytest.skip("slow; set HYFUSE_SLOW_TESTS=1 to run")
+    from hyfuse.ablation import run_window_sensitivity
+    res = run_window_sensitivity(write=False)
+    wins = [r["window_m"] for r in res["rows"]]
+    assert res["headline_window_m"] in wins          # headline is in the sweep
+    assert any(r["is_headline"] for r in res["rows"])
+    for r in res["rows"]:
+        assert "delta" in r and "ci_low" in r and "ci_high" in r
