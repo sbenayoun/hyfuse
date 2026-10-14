@@ -174,3 +174,68 @@ def export_hole(hole_id: str, out_dir: str, *, view: str = "tir",
         path = out / f"{hole_id}_{view}.html"
         fig.write_html(str(path), include_plotlyjs="cdn")
     return str(path)
+
+
+def make_side_by_side(hole_id: str, *, collar_id: int | None = None) -> go.Figure:
+    """SWIR | TIR side-by-side depth logs for one hole (shared depth axis).
+
+    Left = SWIR mineral-group stacks, right = TIR, each with its own detected
+    domain boundaries (red) and the shared logged lithology boundaries (grey
+    dashed). Depth increases downward. This is the "two views see different
+    minerals" visual for the README / pitch slide 2.
+    """
+    from plotly.subplots import make_subplots
+
+    logged = load_logged_boundaries(collar_id) if collar_id else []
+    sw = build_hole_view(hole_id, view="swir", logged=logged)
+    ti = build_hole_view(hole_id, view="tir", logged=logged)
+
+    fig = make_subplots(rows=1, cols=2, shared_yaxes=True,
+                        subplot_titles=("SWIR", "TIR"), horizontal_spacing=0.06)
+
+    for col, data in ((1, sw), (2, ti)):
+        comp = data["composited"]
+        v = (comp[comp["view"] == data["view"]].dropna(subset=["mean_abundance"])
+             if not comp.empty else comp)
+        if v is not None and not v.empty:
+            for grp, g in v.groupby("mineral_group"):
+                d = (g["win_from"] + g["win_to"]) / 2.0
+                fig.add_trace(
+                    go.Bar(y=d, x=g["mean_abundance"], name=str(grp),
+                           orientation="h", legendgroup=str(grp),
+                           showlegend=(col == 1),
+                           hovertemplate=f"{grp}: %{{x:.2f}} @ %{{y:.1f}} m"),
+                    row=1, col=col)
+        res = data.get("domains")
+        if res is not None:
+            for b in res.boundaries:
+                fig.add_hline(y=b, line_color="red", line_width=1, row=1, col=col)
+        for b in data.get("logged_boundaries", []):
+            fig.add_hline(y=b, line_color="grey", line_dash="dash",
+                          line_width=1, row=1, col=col)
+
+    fig.update_layout(barmode="stack", height=900, width=1300,
+                      title=f"{hole_id} — SWIR vs TIR (red = detected domains, "
+                            "grey dashed = logged boundaries)",
+                      legend_title="Mineral group")
+    fig.update_yaxes(autorange="reversed", title="Depth (m)", row=1, col=1)
+    fig.update_xaxes(title="mean abundance", row=1, col=1)
+    fig.update_xaxes(title="mean abundance", row=1, col=2)
+    return fig
+
+
+def export_side_by_side(hole_id: str, out_dir: str, *,
+                        collar_id: int | None = None,
+                        as_png: bool = False) -> str:
+    """Render the SWIR|TIR side-by-side figure to standalone HTML (or PNG)."""
+    from pathlib import Path as _Path
+    fig = make_side_by_side(hole_id, collar_id=collar_id)
+    out = _Path(out_dir)
+    out.mkdir(parents=True, exist_ok=True)
+    if as_png:
+        path = out / f"{hole_id}_swir_tir.png"
+        fig.write_image(str(path), width=1300, height=900, scale=2)
+    else:
+        path = out / f"{hole_id}_swir_tir.html"
+        fig.write_html(str(path), include_plotlyjs="cdn")
+    return str(path)

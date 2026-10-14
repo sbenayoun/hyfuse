@@ -82,3 +82,17 @@ def test_export_hole_writes_html(tmp_path):
     with open(path) as fh:
         head = fh.read(5000)
     assert "plotly" in head.lower() or "Plotly" in head
+
+
+def test_make_side_by_side_two_panels():
+    import plotly.graph_objects as go
+
+    holes = viewer_core.available_holes()
+    if not holes:
+        return
+    fig = viewer_core.make_side_by_side(holes[0])
+    assert isinstance(fig, go.Figure)
+    # two subplot x-axes (SWIR | TIR)
+    assert any(k.startswith("xaxis2") for k in fig.layout) or len(
+        [k for k in fig.layout if k.startswith("xaxis")]) >= 2
+    assert fig.layout.yaxis.autorange == "reversed"

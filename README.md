@@ -162,7 +162,14 @@ plus an **Ablation summary** tab showing the generated results:
 
 ![HyFuse viewer](docs/viewer.png)
 
-*(If the image is missing, run `make viewer` and open http://localhost:8501.)*
+**SWIR vs TIR, same hole** (`16CADD001`) — the two sensors see different
+minerals: TIR resolves SILICA (quartz), feldspars and pyroxenes that are
+invisible to SWIR, while both see the hydroxyl minerals (white mica, chlorite,
+kaolinite). This complementarity is the premise of the project. Interactive
+figures: `docs/16CADD001_swir_tir.html`, `docs/BCMH0070_swir_tir.html` (generate
+with `uv run python scripts/export_side_by_side.py`).
+
+*(If an image is missing, run `make viewer` and open http://localhost:8501.)*
 
 ## Reproducing the figures
 
